@@ -1,6 +1,7 @@
 import discord
 import os
 import dice_v2
+import DiceBot3
 from discord.ext import commands
 DISCORD_TOKEN = 'ODI2NTMzNTA3MDM5MTAwOTY4.YGN3UA.ZbO32L6Gxd1u5W1KznMhlBkqCIc'
 
@@ -30,65 +31,8 @@ async def roll(ctx, *args):
         try:
             print("Roll command invoked")
             #Simplify/condense multiple arguments into a single var
-            arguments = ""
-            mod = "plain" #Set internally:  valid settings:  plain, pos, neg, tn, tear
-            tn=False #Set internally
-            tnhilo=False #Set internally
-            tearing=False #Set internally
-            if(len(args)>1):
-                for each in args:
-                    arguments+=str(each).lower()
-            else:
-                arguments = args[0]
-            print("Result of argument simplification: {}".format(arguments))
-            rollargs = []
-            for each in arguments.split('d'):
-                rollargs.append(each)
-            print("Initial roll arguments: {}".format(rollargs))
-            if('+' in rollargs[1]):
-                tmp = []
-                mod="pos"
-                print("Modified roll with positive modifier.")
-                for each in str(rollargs[1]).split('+'):            
-                    tmp.append(each)
-            if('-' in rollargs[1]):
-                tmp = []
-                mod="neg"
-                print("Modified roll with negative modifier.")
-                for each in str(rollargs[1]).split('-'):
-                    tmp.append(each)
-            if('tn' in rollargs[1]):
-               tmp=[]
-               mod="tn"
-               print("Roll with target number")
-               tn=True
-               if('+' in rollargs[1]):
-                  print("Roll target >= TN")
-                  tnhilo=True
-               else:
-                  print("Roll target <= TN")
-               for each in str(rollargs[1]).split('tn'):
-                   tmp.append(each)
-            if('r' in rollargs[1]):
-                tmp=[]
-                mod="tear"
-                print("Roll with tearing")
-                tearing=True
-                for each in str(rollargs[1]).split('r'):
-                    tmp.append(each)
-            if(mod!="plain"):
-                print("Parse results of rollargs[1]: {}".format(tmp))
-                rollargs[1] = tmp[0]
-            if(mod=="neg"):
-                tmpstr = "-" + str(tmp[1])
-                tmp[1] = tmpstr
-            if(mod!="plain"):
-                rollargs.append(tmp[1])
-            print("Full rollargs: {}".format(rollargs))
-            if mod!="plain":
-                out = dice_v2.dice(int(rollargs[0]),int(rollargs[1]),int(rollargs[2]),tn,tearing,tnhilo)
-            if mod=="plain":
-                out = dice_v2.dice(int(rollargs[0]),int(rollargs[1]))
+            out = DiceBot3.diceRolling(args)
+            
         except Exception as e:
             print(str(e))
             out = "Unable to parse roll command, please refer to ``!help roll`` for syntax"
