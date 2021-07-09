@@ -49,7 +49,8 @@ def diceRolling(input):
             if not mod in validops:
                 return "Compare/Drop:  Invalid operator"
             #drop lowest X
-            if mod == 'dl':    
+            if mod == 'dl':
+                print("Rolled: " + str(origrolls))    
                 index=1
                 while index <= num:
                     dropped.append(rolls[0])
@@ -126,13 +127,13 @@ def diceRolling(input):
             results = rolling(int(matches[0]),int(matches[1]))
             
             if('#' in matches[2]):
-                return str(results) + matches[2]
+                return str(results) +" "+ matches[2]
             if(matches[2][0] in mathSymbols):
                 resultsTotal = 0
                 for x in results:
                     resultsTotal += x
                 resultsTotal += mathHandling(matches[2])
-                return str(results) + " Total: " + str(resultsTotal)
+                return str(results) + " Total = " + str(resultsTotal)
                 
             return "Are you sure?"
         def four():
@@ -145,7 +146,7 @@ def diceRolling(input):
                 for x in results:
                     resultsTotal += x
                 resultsTotal += mathHandling(matches[2])
-                return str(results) + " Total: " + str(resultsTotal) +" "+ matches[3]
+                return str(results) + " Total = " + str(resultsTotal) +" "+ matches[3]
             if (matches[3].isdigit()):
                 modNum = matches[3]
                 modNum = int(modNum)
@@ -155,7 +156,7 @@ def diceRolling(input):
             if(matches[2][0] == 'd'):
                 for x in results:
                     dropTotal += int(x)
-                return str(results) + " Total: " + str(dropTotal)
+                return str(results) + " Total = " + str(dropTotal)
             return results    
         def five():
             results = rolling(int(matches[0]),int(matches[1]))
@@ -165,8 +166,12 @@ def diceRolling(input):
             else:
                 return "Something ain't right chief"
             if('#' in matches[4]):
-                output = compareOrDrop(results,mod,modNum)
-                return str(output) + matches[4]
+                output = compareOrDrop(results,mod,modNum) #fix/add totals for dropping dice here
+                if matches[2][0] == 'd':
+                    resultsTotal = 0
+                    for x in output:
+                        resultsTotal += x
+                    return str(output) +" Total = "+ resultsTotal +matches[4]
             if (matches[4][0] in mathSymbols):
                 output = compareOrDrop(results,mod,modNum)
                 if matches[2][0] == 'd':
@@ -180,7 +185,7 @@ def diceRolling(input):
                         resultsTotal += x
                     resultsTotal += mathHandling(matches[4])   
 
-                return str(output) + "Total = " + str(resultsTotal)
+                return str(output) + " Total = " + str(resultsTotal)
 
             return "Literally How?"
         def six():
@@ -198,7 +203,7 @@ def diceRolling(input):
                 for x in results:
                     resultsTotal += x
                 resultsTotal += mathHandling(matches[4])
-            return str(output) + "Total = " + str(resultsTotal) +" "+ matches[5]
+            return str(output) + " Total = " + str(resultsTotal) +" "+ matches[5]
 
         def groupCases(argument):
             switcher = {
@@ -219,13 +224,13 @@ def diceRolling(input):
         print(str(e))
     
 
-plz = diceRolling("3d10dl2+5+6#I am the comment")
+plz = diceRolling("4d10dl2")
 print(plz)
 # diceRolling("1d100<=30")
 #diceRolling("3d10dl1")
 # diceRolling("1d100>45")
 #diceRolling("2d100<30")
-# for test in testCases:
-#     diceRolling(test)
-#     print("End Roll")
+for test in testCases:
+    print(diceRolling(test))
+    print("End Roll")
 
