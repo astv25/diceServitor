@@ -27,8 +27,7 @@ def diceRolling(input):
         rolls = []
         mathSymbols = ['+','-','/','*']
         modSymbols = ['>','<','d']
-        # for match in matches:
-        #     print(match)
+       
         def rolling(numDice,numSides):
             for i in range(1,numDice+1):
                 roll = random.randrange(1,numSides+1)
@@ -211,14 +210,17 @@ def diceRolling(input):
             }
 
             func = switcher.get(argument, lambda: "Invalid Length")
-            print(func())
+            return (func())
         
-        groupCases(test)
+        return groupCases(test)
+        
+        
     except Exception as e:
         print(str(e))
     
 
-#diceRolling("3d10dl2+5+6#I am the comment")
+plz = diceRolling("3d10dl2+5+6#I am the comment")
+print(plz)
 # diceRolling("1d100<=30")
 #diceRolling("3d10dl1")
 # diceRolling("1d100>45")
