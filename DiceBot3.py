@@ -33,10 +33,70 @@ def diceRolling(input):
             for i in range(1,numDice+1):
                 roll = random.randrange(1,numSides+1)
                 rolls.append(roll)
+            rolls.sort()
             return rolls
 
         def compareOrDrop(rolls,mod,num):
-            
+            #mod:  > < d >= <=
+            #rolls:  list of rolls
+            #num:  TN or drop count
+            origrolls = []
+            compequal=False            
+            dropped = []
+            total = 0
+            out = []
+            origrolls.extend(rolls)
+            validops = ['>', '>=', '<=', '<', 'dl']
+            if not mod in validops:
+                return "Compare/Drop:  Invalid operator"
+            #drop lowest X
+            if mod == 'dl':    
+                index=1
+                while index <= num:
+                    dropped.append(rolls[0])
+                    rolls.pop(0)
+                    index+=1
+                total=sum(rolls)
+                out.append("Rolled {0}.  Dropped {1}.  Total {2}".format(origrolls,dropped,total))
+                #print(out)
+                return out
+            if mod == '>' or mod == '>=':
+                if '=' in mod:
+                    compequal=True
+                index=0
+                while index<len(rolls):
+                    passfail=False
+                    degrees = rolls[index] - num
+                    degrees = degrees / 10
+                    if(compequal):
+                        if(degrees>=0):
+                            passfail=True
+                    else:
+                        if(degrees>0):
+                            passfail=True
+                    out.append("Rolled {0}, TN {1}.  {2} Degrees of {3}!\n".format(rolls[index], num, degrees, "Success" if (passfail) else "Failure"))
+                    index+=1
+                #print(out)
+                return out
+            if mod == '<' or mod == '<=':
+                if '=' in mod:
+                    compequal=True
+                index=0
+                while index<len(rolls):
+                    passfail=False
+                    degrees = num - rolls[index]
+                    degrees = degrees / 10
+                    if(compequal):
+                        if(degrees>=0):
+                            passfail=True
+                    else:
+                        if(degrees>0):
+                            passfail=True
+                    out.append("Rolled {0}, TN {1}.  {2} Degrees of {3}!\n".format(rolls[index], num, degrees, "Success" if (passfail) else "Failure"))
+                    index+=1
+                #print(out)
+                return out
+                    
 
         def mathHandling(input):
             total = 0
@@ -79,18 +139,20 @@ def diceRolling(input):
         def four():
             results = rolling(int(matches[0]),int(matches[1]))
             if (matches[2][0] in modSymbols):
-                mod = matches[2]
+                mod = matches[2]                
             else:
                 return "Bad stop it"   
             if (matches[3].isdigit()):
                 modNum = matches[3]
+                modNum = int(modNum)
             else:
-                return "Reconsider this entry... and your life choices"    
+                return "Reconsider this entry... and your life choices"
+            return compareOrDrop(results,mod,modNum)
 
             
 
 
-            return "this is a roll with a single mod"
+            #return "this is a roll with a single mod"
         def five():
             return "this is a die roll with multiple mods and/or a comment"
         def six():
@@ -113,8 +175,11 @@ def diceRolling(input):
         print(str(e))
     
 
-diceRolling("1d2>=4")
-
+diceRolling("1d100>=45")
+diceRolling("1d100<=30")
+diceRolling("3d10dl2")
+diceRolling("1d100>45")
+diceRolling("1d100<30")
 # for test in testCases:
 #     diceRolling(test)
 #     print("End Roll")
