@@ -112,36 +112,91 @@ def diceRolling(input):
             results = rolling(int(matches[0]),int(matches[1]))
             
             if('#' in matches[2]):
-                return str(results) + matches[2]
+                return str(results) +" "+ matches[2]
             if(matches[2][0] in mathSymbols):
                 resultsTotal = 0
                 for x in results:
                     resultsTotal += x
                 resultsTotal += mathHandling(matches[2])
-                return str(results) + " Total: " + str(resultsTotal)
+                return str(results) + " Total = " + str(resultsTotal)
                 
             return "Are you sure?"
         def four():
             results = rolling(int(matches[0]),int(matches[1]))
+            dropTotal = 0
+            droppedOutput = str(results)
             if (matches[2][0] in modSymbols):
                 mod = matches[2]                
-            else:
-                return "Bad stop it"   
+            if (matches[2][0] in mathSymbols):
+                resultsTotal = 0
+                for x in results:
+                    resultsTotal += x
+                resultsTotal += mathHandling(matches[2])
+                return str(results) + " Total = " + str(resultsTotal) +" "+ matches[3]
             if (matches[3].isdigit()):
                 modNum = matches[3]
                 modNum = int(modNum)
             else:
                 return "Reconsider this entry... and your life choices"
-            return compareOrDrop(results,mod,modNum)
-
-            
-
-
-            #return "this is a roll with a single mod"
+            output = compareOrDrop(results,mod,modNum)
+            if(matches[2][0] == 'd'):
+                for x in results:
+                    dropTotal += int(x)
+                return "Original rolls = "+ str(droppedOutput) +" After Dropping = " + str(output) + " Total = " + str(dropTotal)
+            return output    
         def five():
-            return "this is a die roll with multiple mods and/or a comment"
+            results = rolling(int(matches[0]),int(matches[1]))
+            droppedOutput = str(results)
+            if (matches[2][0] in modSymbols and matches[3][0].isdigit()):
+                mod = matches[2]
+                modNum = int(matches[3])
+            else:
+                return "Something ain't right chief"
+            if('#' in matches[4]):
+                output = compareOrDrop(results,mod,modNum) #fix/add totals for dropping dice here
+                if matches[2][0] == 'd':
+                    resultsTotal = 0
+                    for x in output:
+                        resultsTotal += x
+                    return "Original rolls = "+ str(droppedOutput) +" After Dropping = " + str(output) +" Total = "+ str(resultsTotal) +str(matches[4])
+            if (matches[4][0] in mathSymbols):
+                output = compareOrDrop(results,mod,modNum)
+                if matches[2][0] == 'd':
+                    resultsTotal = 0
+                    for x in output:
+                        resultsTotal += x
+                    resultsTotal += mathHandling(matches[4])
+                    return "Original rolls = "+ str(droppedOutput) +" After Dropping = " + str(output) + " Total = " + str(resultsTotal)
+                else:
+                    resultsTotal = 0
+                    for x in results:
+                        resultsTotal += x
+                    resultsTotal += mathHandling(matches[4])   
+                    return str(output) + " Total = " + str(resultsTotal)
+                
+            return "Literally How?"
         def six():
-            return "This is a die roll with multiple mods and a comment"
+            results = rolling(int(matches[0]),int(matches[1]))
+            mod = matches[2]
+            modNum = int(matches[3])
+            droppedOutput = str(results)
+            output = compareOrDrop(results,mod,modNum)
+            if matches[2][0] == 'd': 
+                resultsTotal = 0
+                for x in output:
+                    resultsTotal += x
+                resultsTotal += mathHandling(matches[4])
+            else:
+                droppedOutput == None
+                resultsTotal = 0
+                for x in results:
+                    resultsTotal += x
+                resultsTotal += mathHandling(matches[4])
+            if droppedOutput == None:
+                return str(output) + " Total = " + str(resultsTotal) +" "+ matches[5]
+            else:
+                return "Original rolls = "+ str(droppedOutput) +" After Dropping = " + str(output) + " Total = " + str(resultsTotal) +" "+ matches[5]
+
 
         def groupCases(argument):
             switcher = {
