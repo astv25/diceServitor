@@ -231,18 +231,3 @@ def diceRolling(input):
         
     except Exception as e:
         print(str(e))
-<<<<<<< Updated upstream
-=======
-    
-
-# plz = diceRolling("4d10dl2")
-# print(plz)
-# diceRolling("1d100<=30")
-#diceRolling("3d10dl1")
-# diceRolling("1d100>45")
-#diceRolling("2d100<30")
-# for test in testCases:
-#     print(diceRolling(test))
-#     print("End Roll")
-
->>>>>>> Stashed changes
