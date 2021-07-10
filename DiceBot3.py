@@ -230,7 +230,7 @@ print(plz)
 #diceRolling("3d10dl1")
 # diceRolling("1d100>45")
 #diceRolling("2d100<30")
-for test in testCases:
-    print(diceRolling(test))
-    print("End Roll")
+# for test in testCases:
+#     print(diceRolling(test))
+#     print("End Roll")
 
