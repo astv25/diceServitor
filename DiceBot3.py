@@ -139,7 +139,7 @@ def diceRolling(input):
         def four():
             results = rolling(int(matches[0]),int(matches[1]))
             dropTotal = 0
-            droppedOutput = results
+            droppedOutput = str(results)
             if (matches[2][0] in modSymbols):
                 mod = matches[2]                
             if (matches[2][0] in mathSymbols):
@@ -231,3 +231,4 @@ def diceRolling(input):
         
     except Exception as e:
         print(str(e))
+
