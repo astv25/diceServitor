@@ -61,7 +61,7 @@ async def updateself(ctx, *args):
         if len(args) == 1:
             if str(args[0]) == SYS_PASS:
                 out = "Updating server side code..."
-                #todo:  actually update
+                os.system('./botUpdate.sh')
         message = ctx.author.mention + " " + str(out)
     await ctx.channel.send(message)
 
