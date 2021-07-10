@@ -158,7 +158,7 @@ def diceRolling(input):
                 for x in results:
                     dropTotal += int(x)
                 return "Original rolls = "+ str(droppedOutput) +" After Dropping = " + str(output) + " Total = " + str(dropTotal)
-            return results    
+            return output    
         def five():
             results = rolling(int(matches[0]),int(matches[1]))
             droppedOutput = str(results)
@@ -230,3 +230,4 @@ def diceRolling(input):
     except Exception as e:
         print(str(e))
 
+print(diceRolling("2d100dl1"))
