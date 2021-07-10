@@ -40,38 +40,7 @@ async def roll(ctx, *args):
         except Exception as e:
             print(str(e))
             out = "Unable to parse roll command, please refer to ``!help roll`` for syntax"
-        message = ctx.author.mention + " " + out
-    await ctx.channel.send(message)
-
-@bot.command(
-    help = """Does basic mathematics.
-              The command is spacing agnostic, but reacts badly to malformed commands.              
-              Syntax:  math 3+5    will add 3 and 5
-                       math 3*5    will multiply 3 and 5
-                       math 3/5    will divide 3 by 5
-                       math 5%3    will find the modulus of 5 and 3
-           """,
-    brief = "Does math, retard."
-)
-async def math(ctx, *args):
-    async with ctx.typing():
-        try:
-            print("Math command invoked")
-            #Simplify/condense multiple arguments into a single var
-            arguments = ""
-            if(len(args)>1):
-                for each in args:
-                    arguments+=str(each).lower()
-            else:
-                arguments = args[0]
-            print("Result of argument simplification: {}".format(arguments))
-            out = eval(arguments)
-        except Exception as e:
-            print(str(e))
-            out = "Unable to parse command, please try again."
         message = ctx.author.mention + " " + str(out)
     await ctx.channel.send(message)
-
-
 
 bot.run(DISCORD_TOKEN)

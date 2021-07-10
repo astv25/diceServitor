@@ -74,7 +74,7 @@ def diceRolling(input):
                     else:
                         if(degrees>0):
                             passfail=True
-                    out.append("Rolled {0}, TN {1}.  {2} Degrees of {3}!\n".format(rolls[index], num, degrees, "Success" if (passfail) else "Failure"))
+                    out.append("Rolled {0}, TN {1}.  {2} Degrees of {3}!".format(rolls[index], num, degrees, "Success" if (passfail) else "Failure"))
                     index+=1
                 #print(out)
                 return out
@@ -222,15 +222,3 @@ def diceRolling(input):
         
     except Exception as e:
         print(str(e))
-    
-
-plz = diceRolling("4d10dl2")
-print(plz)
-# diceRolling("1d100<=30")
-#diceRolling("3d10dl1")
-# diceRolling("1d100>45")
-#diceRolling("2d100<30")
-# for test in testCases:
-#     print(diceRolling(test))
-#     print("End Roll")
-
