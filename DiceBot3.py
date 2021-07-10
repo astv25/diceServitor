@@ -194,15 +194,15 @@ def diceRolling(input):
             results = rolling(int(matches[0]),int(matches[1]))
             mod = matches[2]
             modNum = int(matches[3])
+            droppedOutput = str(results)
             output = compareOrDrop(results,mod,modNum)
-            droppedOutput = None
             if matches[2][0] == 'd': 
-                droppedOutput = results
                 resultsTotal = 0
                 for x in output:
                     resultsTotal += x
                 resultsTotal += mathHandling(matches[4])
             else:
+                droppedOutput == None
                 resultsTotal = 0
                 for x in results:
                     resultsTotal += x
