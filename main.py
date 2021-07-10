@@ -4,13 +4,9 @@ import dice_v2
 import DiceBot3
 from discord.ext import commands
 tokenfile="botToken.txt"
-gitfile="gitToken.txt"
 adminFile="adminPW.txt"
 f = open(tokenfile,"r")
 DISCORD_TOKEN = f.read()
-f.close()
-f = open(gitfile,"r")
-GIT_TOKEN = f.read()
 f.close()
 f = open(adminFile,"r")
 SYS_PASS = f.read()
@@ -54,12 +50,16 @@ async def roll(ctx, *args):
         message = ctx.author.mention + " " + str(out)
     await ctx.channel.send(message)
 
+@bot.command ()
 async def updateself(ctx, *args):
     async with ctx.typing():
-        if len(args)>1:
+        print("Self update command invoked.")
+        out = ""
+        if len(args)>1 or len(args) == 0:
             out = "Nope."
         if len(args) == 1:
             if str(args[0]) == SYS_PASS:
+                print("Update authentication successful.")
                 out = "Updating server side code..."
                 os.system('./botUpdate.sh')
         message = ctx.author.mention + " " + str(out)
