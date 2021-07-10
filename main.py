@@ -57,13 +57,12 @@ async def updateself(ctx, *args):
         out = ""
         print(args)
         print("Length of args: {}".format(len(args)))
-        if len(args)>1 or len(args) == 0:
-            out = "Nope."
-        if len(args) == 1:
-            if str(args[0]) == SYS_PASS:
-                print("Update authentication successful.")
-                out = "Updating server side code..."
-                os.system('./botUpdate.sh')
+        if str(args[0]) == SYS_PASS:
+            print("Update authentication successful.")
+            out = "Updating server side code..."
+            os.system('./botUpdate.sh')
+        else:
+            out = "Auth failed"
         message = ctx.author.mention + " " + str(out)
     await ctx.channel.send(message)
 
