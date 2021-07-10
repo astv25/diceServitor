@@ -230,4 +230,3 @@ def diceRolling(input):
     except Exception as e:
         print(str(e))
 
-print(diceRolling("2d100dl1"))
