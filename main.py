@@ -30,13 +30,17 @@ async def roll(ctx, *args):
     async with ctx.typing():
         try:
             print("Roll command invoked")
+            argument=""
             #Simplify/condense multiple arguments into a single var
-            out = DiceBot3.diceRolling(args)
+            for arg in args:
+                argument += arg
+            out = DiceBot3.diceRolling(argument)
+            print(out)
             
         except Exception as e:
             print(str(e))
             out = "Unable to parse roll command, please refer to ``!help roll`` for syntax"
-        message = ctx.author.mention + " " + str(out)
+        message = ctx.author.mention + " " + out
     await ctx.channel.send(message)
 
 @bot.command(
