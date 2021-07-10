@@ -55,6 +55,8 @@ async def updateself(ctx, *args):
     async with ctx.typing():
         print("Self update command invoked.")
         out = ""
+        print(args)
+        print("Length of args: {}".format(len(args)))
         if len(args)>1 or len(args) == 0:
             out = "Nope."
         if len(args) == 1:
