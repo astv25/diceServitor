@@ -161,7 +161,7 @@ def diceRolling(input):
             return results    
         def five():
             results = rolling(int(matches[0]),int(matches[1]))
-            droppedOutput = None
+            droppedOutput = str(results)
             if (matches[2][0] in modSymbols and matches[3][0].isdigit()):
                 mod = matches[2]
                 modNum = int(matches[3])
@@ -170,11 +170,10 @@ def diceRolling(input):
             if('#' in matches[4]):
                 output = compareOrDrop(results,mod,modNum) #fix/add totals for dropping dice here
                 if matches[2][0] == 'd':
-                    droppedOutput = results
                     resultsTotal = 0
                     for x in output:
                         resultsTotal += x
-                    return str(output) +" Total = "+ resultsTotal +matches[4]
+                    return "Original rolls = "+ str(droppedOutput) +" After Dropping = " + str(output) +" Total = "+ resultsTotal +matches[4]
             if (matches[4][0] in mathSymbols):
                 output = compareOrDrop(results,mod,modNum)
                 if matches[2][0] == 'd':
@@ -182,15 +181,14 @@ def diceRolling(input):
                     for x in output:
                         resultsTotal += x
                     resultsTotal += mathHandling(matches[4])
+                    return "Original rolls = "+ str(droppedOutput) +" After Dropping = " + str(output) + " Total = " + str(resultsTotal)
                 else:
                     resultsTotal = 0
                     for x in results:
                         resultsTotal += x
                     resultsTotal += mathHandling(matches[4])   
-                if droppedOutput == None:
                     return str(output) + " Total = " + str(resultsTotal)
-                else:
-                    return "Original rolls = "+ str(droppedOutput) +" After Dropping = " + str(output) + " Total = " + str(resultsTotal)
+                
             return "Literally How?"
         def six():
             results = rolling(int(matches[0]),int(matches[1]))
