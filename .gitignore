@@ -1,6 +1,7 @@
 # Tokens
 botToken.txt
 adminPW.txt
+discordToken
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
