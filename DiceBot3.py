@@ -92,7 +92,7 @@ def diceRolling(input):
                     else:
                         if(degrees>0):
                             passfail=True
-                    out.append("Rolled {0}, TN {1}.  {2} Degrees of {3}!\n".format(rolls[index], num, degrees, "Success" if (passfail) else "Failure"))
+                    out.append("Rolled {0}, TN {1}.  {2} Degrees of {3}!".format(rolls[index], num, degrees, "Success" if (passfail) else "Failure"))
                     index+=1
                 #print(out)
                 return out
