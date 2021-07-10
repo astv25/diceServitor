@@ -24,13 +24,13 @@ async def ping(ctx):
 @bot.command(
     help = """Rolls dice.  Supports Target Number, +/- modification, and drop lowest.
               The command doesn't care about spacing, but any malformed arguments will throw it off. :(
-              Syntax:  roll 3d10        will roll 3 d10
-                       roll 3d10+5      will roll 3 d10 and add 5 (Other supported math symbols include '-', '*', '/'.
-                                        Please note pemdas is not implemented. Use mdas as the input format)
-                       roll 1d100<=45   will roll 1 d100 and report each degree of success or failure for a roll <=45
-                       roll 1d100>=45  will roll 1 d100 and report each degree of success or failure for a roll >=45
-                       roll 1d100<45  will roll 1 d100 and report each degree of success or failure for a roll <45
-                       roll 1d100>45  will roll 1 d100 and report each degree of success or failure for a roll >45                        
+              Syntax:  roll 3d10#comment will roll 3 d10 with a comment (use underscores instead of spaces)
+                       roll 3d10+5       will roll 3 d10 and add 5 (Other supported math symbols include '-', '*', '/'.
+                                         Please note pemdas is not implemented. Use mdas as the input format)
+                       roll 1d100<=45    will roll 1 d100 and report each degree of success or failure for a roll <=45
+                       roll 1d100>=45    will roll 1 d100 and report each degree of success or failure for a roll >=45
+                       roll 1d100<45     will roll 1 d100 and report each degree of success or failure for a roll <45
+                       roll 1d100>45     will roll 1 d100 and report each degree of success or failure for a roll >45                        
                        roll 3d10dl2      will roll 3 d10 and remove the lowest 2 die.""",
     brief = "Rolls dice, retard"
 )
