@@ -3,7 +3,14 @@ import os
 import dice_v2
 import DiceBot3
 from discord.ext import commands
-DISCORD_TOKEN = 'ODI2NTMzNTA3MDM5MTAwOTY4.YGN3UA.ZbO32L6Gxd1u5W1KznMhlBkqCIc'
+tokenfile="botToken.txt"
+adminFile="adminPW.txt"
+f = open(tokenfile,"r")
+DISCORD_TOKEN = f.read()
+f.close()
+f = open(adminFile,"r")
+SYS_PASS = f.read()
+f.close()
 
 bot = commands.Bot(command_prefix="!")
 
@@ -40,6 +47,22 @@ async def roll(ctx, *args):
         except Exception as e:
             print(str(e))
             out = "Unable to parse roll command, please refer to ``!help roll`` for syntax"
+        message = ctx.author.mention + " " + str(out)
+    await ctx.channel.send(message)
+
+@bot.command ()
+async def updateself(ctx, *args):
+    async with ctx.typing():
+        print("Self update command invoked.")
+        out = ""
+        print(args)
+        print("Length of args: {}".format(len(args)))
+        if str(args[0]) == SYS_PASS:
+            print("Update authentication successful.")
+            out = "Updating server side code..."
+            os.system('./botUpdate.sh')
+        else:
+            out = "Auth failed"
         message = ctx.author.mention + " " + str(out)
     await ctx.channel.send(message)
 
