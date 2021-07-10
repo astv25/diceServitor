@@ -1,6 +1,6 @@
 import discord
 import os
-import dice_v2
+#import dice_v2
 import DiceBot3
 from discord.ext import commands
 tokenfile="botToken.txt"
@@ -8,9 +8,13 @@ adminFile="adminPW.txt"
 f = open(tokenfile,"r")
 DISCORD_TOKEN = f.read()
 f.close()
+#clear any trailing newlines
+DISCORD_TOKEN = DISCORD_TOKEN.strip()
 f = open(adminFile,"r")
 SYS_PASS = f.read()
 f.close()
+#clear any trailing newlines
+SYS_PASS = SYS_PASS.strip()
 
 bot = commands.Bot(command_prefix="!")
 
@@ -32,16 +36,17 @@ async def ping(ctx):
                        roll 1d100<45     will roll 1 d100 and report each degree of success or failure for a roll <45
                        roll 1d100>45     will roll 1 d100 and report each degree of success or failure for a roll >45                        
                        roll 3d10dl2      will roll 3 d10 and remove the lowest 2 die.""",
-    brief = "Rolls dice, retard"
+    brief = "Rolls dice"
 )
 async def roll(ctx, *args):
     async with ctx.typing():
         try:
-            print("Roll command invoked")
+            print("Roll command invoked with arguments: {}".format(args))
             argument=""
             #Simplify/condense multiple arguments into a single var
             for arg in args:
                 argument += arg
+            print("Results of argument simplicication: {}".format(argument))
             out = DiceBot3.diceRolling(argument)
             print(out)
             
