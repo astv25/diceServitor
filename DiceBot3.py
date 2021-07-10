@@ -173,7 +173,7 @@ def diceRolling(input):
                     resultsTotal = 0
                     for x in output:
                         resultsTotal += x
-                    return "Original rolls = "+ str(droppedOutput) +" After Dropping = " + str(output) +" Total = "+ resultsTotal +matches[4]
+                    return "Original rolls = "+ str(droppedOutput) +" After Dropping = " + str(output) +" Total = "+ str(resultsTotal) +str(matches[4])
             if (matches[4][0] in mathSymbols):
                 output = compareOrDrop(results,mod,modNum)
                 if matches[2][0] == 'd':
