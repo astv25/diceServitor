@@ -159,6 +159,7 @@ def diceRolling(input):
                     for x in output:
                         resultsTotal += x
                     return "Original rolls = "+ str(droppedOutput) +" After Dropping = " + str(output) +" Total = "+ str(resultsTotal) +str(matches[4])
+                return str(output) + " " + str(matches[4])
             if (matches[4][0] in mathSymbols):
                 output = compareOrDrop(results,mod,modNum)
                 if matches[2][0] == 'd':
@@ -214,3 +215,4 @@ def diceRolling(input):
 
     except Exception as e:
         print(str(e))
+
