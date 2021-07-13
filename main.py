@@ -1,20 +1,15 @@
 import discord
 import os
 #import dice_v2
+from xml.dom import minidom
 import DiceBot3
 from discord.ext import commands
-tokenfile="botToken.txt"
-adminFile="adminPW.txt"
-f = open(tokenfile,"r")
-DISCORD_TOKEN = f.read()
-f.close()
-#clear any trailing newlines
-DISCORD_TOKEN = DISCORD_TOKEN.strip()
-f = open(adminFile,"r")
-SYS_PASS = f.read()
-f.close()
-#clear any trailing newlines
-SYS_PASS = SYS_PASS.strip()
+
+#Read config file
+configFile = 'config.xml'
+config = minidom.parse(configFile)
+DISCORD_TOKEN = config.getElementsByTagName('discordToken')[0].firstChild.data
+SYS_PASS = config.getElementsByTagName('adminPass')[0].firstChild.data
 
 bot = commands.Bot(command_prefix="!")
 
