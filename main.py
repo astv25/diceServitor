@@ -51,19 +51,24 @@ async def roll(ctx, *args):
         message = ctx.author.mention + " " + str(out)
     await ctx.channel.send(message)
 
-@bot.command ()
+@bot.command (hidden=True)
+@commands.has_role('DS-Developer')
+
 async def updateself(ctx, *args):
     async with ctx.typing():
         print("Self update command invoked.")
         out = ""
         print(args)
         print("Length of args: {}".format(len(args)))
-        if str(args[0]) == SYS_PASS:
-            print("Update authentication successful.")
-            out = "Updating server side code..."
-            os.system('./botUpdate.sh')
-        else:
-            out = "Auth failed"
+        try:
+            if str(args[0]) == SYS_PASS:
+                print("Update authentication successful.")
+                out = "Updating server side code..."
+                os.system('./botUpdate.sh')
+            else:
+                out = "Auth failed"
+        except Exception as e:
+            out = "Exception in updateSelf: {}".format(e)
         message = ctx.author.mention + " " + str(out)
     await ctx.channel.send(message)
 
