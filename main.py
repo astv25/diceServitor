@@ -9,7 +9,7 @@ from discord.ext import commands
 configFile = 'config.xml'
 config = minidom.parse(configFile)
 DISCORD_TOKEN = config.getElementsByTagName('discordToken')[0].firstChild.data
-SYS_PASS = config.getElementsByTagName('adminPass')[0].firstChild.data
+SYS_PASS = config.getElementsByTagName('adminPassword')[0].firstChild.data
 
 bot = commands.Bot(command_prefix="!")
 
