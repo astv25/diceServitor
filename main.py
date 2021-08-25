@@ -1,5 +1,6 @@
 import discord
 import os
+import subprocess
 #import dice_v2
 from xml.dom import minidom
 import DiceBot3
@@ -66,13 +67,13 @@ async def system(ctx, *args):
                 if str(args[1]) == SYS_PASS:
                     print("Update authentication successful.")
                     out += "Updating server side code..."
-                    os.system('./botUpdate.sh')
+                    out += subprocess.getoutput('./botUpdate.sh')
                 else:
                     out += "Self update authentication failed"
             if str(args[0]).lower() == "getversion":
                 out += "Dice Servitor version: {}".format(BOT_VERSION)
             if str(args[0]).lower() == "getshard":
-                out += os.system('wget -q -O - http://169.254.169.254/latest/meta-data/instance-id')
+                out += subprocess.getoutput('wget -q -O - http://169.254.169.254/latest/meta-data/instance-id')
         except Exception as e:
             out += "Exception in system: {}".format(e)
         message = ctx.author.mention + " " + str(out)
