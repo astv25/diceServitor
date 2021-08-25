@@ -8,6 +8,7 @@ from discord.ext import commands
 #Read config file
 configFile = 'config.xml'
 config = minidom.parse(configFile)
+BOT_VERSION = config.getElementsByTagName('botVersion')[0].firstChild.data
 DISCORD_TOKEN = config.getElementsByTagName('discordToken')[0].firstChild.data
 SYS_PASS = config.getElementsByTagName('adminPassword')[0].firstChild.data
 
@@ -54,21 +55,26 @@ async def roll(ctx, *args):
 @bot.command (hidden=True)
 @commands.has_role('DS-Developer')
 
-async def updateself(ctx, *args):
+async def system(ctx, *args):
     async with ctx.typing():
-        print("Self update command invoked.")
-        out = ""
-        print(args)
-        print("Length of args: {}".format(len(args)))
-        try:
-            if str(args[0]) == SYS_PASS:
-                print("Update authentication successful.")
-                out = "Updating server side code..."
-                os.system('./botUpdate.sh')
-            else:
-                out = "Auth failed"
+        try:    
+            print("System command invoked with arguments: {}".format(args))
+            out = ""
+            print(args)
+            print("Length of args: {}".format(len(args)))
+            if str(args[0]).lower() == "updateself":
+                if str(args[1]) == SYS_PASS:
+                    print("Update authentication successful.")
+                    out += "Updating server side code..."
+                    os.system('./botUpdate.sh')
+                else:
+                    out += "Self update authentication failed"
+            if str(args[0]).lower() == "getversion":
+                out += "Dice Servitor version: {}".format(BOT_VERSION)
+            if str(args[0]).lower() == "getshard":
+                out += os.system('wget -q -O - http://169.254.169.254/latest/meta-data/instance-id')
         except Exception as e:
-            out = "Exception in updateSelf: {}".format(e)
+            out += "Exception in system: {}".format(e)
         message = ctx.author.mention + " " + str(out)
     await ctx.channel.send(message)
 

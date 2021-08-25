@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
+<botVersion>MAJOR.MINOR.REVISION</botVersion>
 <discordToken>REPLACEME</discordToken>
 <adminPassword>SERIOUSLYREPLACEME</adminPassword>
 </config>
