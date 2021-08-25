@@ -1,6 +1,9 @@
 # Config
 config.xml
 
+#Old Shit
+oldguts/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
