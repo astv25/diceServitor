@@ -19,7 +19,6 @@ def diceRolling(input):
     try:
         print("Rolling: " +input)
         random.seed()
-
         input = input.lower().strip() #basic formatting
         pattern_d = re.compile('([\d]+)d([\d]+)([><d]?[=l]?)([\d]+)?([+-/*\d]+)?(#.+)?')
         matches = pattern_d.split(input)
