@@ -6,6 +6,8 @@ from xml.dom import minidom
 import DiceBot3
 from discord.ext import commands
 
+print("Dice Servitor initializing...")
+
 #Read config file
 configFile = 'config.xml'
 config = minidom.parse(configFile)
@@ -66,8 +68,8 @@ async def system(ctx, *args):
             if str(args[0]).lower() == "updateself":
                 if str(args[1]) == SYS_PASS:
                     print("Update authentication successful.")
-                    out += "Updating server side code..."
-                    out += subprocess.getoutput('./botUpdate.sh')
+                    await ctx.channel.send("Updating server side code...")
+                    os.system('./botUpdate.sh')
                 else:
                     out += "Self update authentication failed"
             if str(args[0]).lower() == "getversion":
@@ -80,3 +82,5 @@ async def system(ctx, *args):
     await ctx.channel.send(message)
 
 bot.run(DISCORD_TOKEN)
+
+print("Dice Servitor initialized.")
