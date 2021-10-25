@@ -55,6 +55,36 @@ async def roll(ctx, *args):
         message = ctx.author.mention + " " + str(out)
     await ctx.channel.send(message)
 
+@bot.command(
+    help = """Does the basic rolls for creating a Rogue Trader character all at once.
+              Rolls 9x 2d10+25 for characteristics plus an additional, optional replacment
+              Rolls 1d5 for wounds
+              Rolls 1d10 for fate""",
+    brief = "Rolls dice for Rogue Trader chargen"
+)
+async def rtchargen(ctx, *args):
+    async with ctx.typing():
+        print("Character generation command invoked, arguments ignored.")
+        characteristics=[]
+        #EXTREME LAZINESS INCOMING
+        characteristics.append(DiceBot3.diceRolling("2d10+25")[-2:])
+        characteristics.append(DiceBot3.diceRolling("2d10+25")[-2:])
+        characteristics.append(DiceBot3.diceRolling("2d10+25")[-2:])
+        characteristics.append(DiceBot3.diceRolling("2d10+25")[-2:])
+        characteristics.append(DiceBot3.diceRolling("2d10+25")[-2:])
+        characteristics.append(DiceBot3.diceRolling("2d10+25")[-2:])
+        characteristics.append(DiceBot3.diceRolling("2d10+25")[-2:])
+        characteristics.append(DiceBot3.diceRolling("2d10+25")[-2:])
+        characteristics.append(DiceBot3.diceRolling("2d10+25")[-2:])
+        optreplace = DiceBot3.diceRolling("2d10+25")[-2:]
+        wounds = DiceBot3.diceRolling("1d5")[0]
+        fate = DiceBot3.diceRolling("1d10")[0]
+        out = "Characteristic rolls: {}".format(characteristics)
+        out += "  Optional replacement roll: {}".format(optreplace)
+        out += "  Wounds Roll:  {}".format(wounds)
+        out += "  Fate Roll:  {}".format(fate)
+        message = ctx.author.mention + " " + str(out)
+    await ctx.channel.send(message)
 @bot.command (hidden=True)
 @commands.has_role('DS-Developer')
 
