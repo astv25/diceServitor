@@ -10,6 +10,7 @@ print("Dice Servitor initializing...")
 
 #Read config file
 configFile = 'config.xml'
+os.chdir('/root/diceServitor')
 config = minidom.parse(configFile)
 BOT_VERSION = config.getElementsByTagName('botVersion')[0].firstChild.data
 DISCORD_TOKEN = config.getElementsByTagName('discordToken')[0].firstChild.data
