@@ -33,7 +33,7 @@ def diceRolling(input):
                 random.seed()
                 roll = random.randrange(1,numSides+1)
                 rolls.append(roll)
-            rolls.sort()
+            #rolls.sort()
             return rolls
 
         def compareOrDrop(rolls,mod,num):
@@ -54,11 +54,14 @@ def diceRolling(input):
             if mod == 'dl':
                 print("Rolled: " + str(origrolls))
                 index=1
+                tmprolls
+                tmprolls.append(rolls)
+                tmprolls.sort()
                 while index <= num:
-                    dropped.append(rolls[0])
-                    rolls.pop(0)
+                    dropped.append(tmprolls[0])
+                    tmprolls.pop(0)
                     index+=1
-                return rolls
+                return tmprolls
             #roll over/at/under TN
             if '>' in mod:
                 compswitch=True
