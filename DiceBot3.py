@@ -16,6 +16,10 @@ i = "hkhkjhkh"
 j = "1d10#Hello world"
 testCases =[a,b,c,d,e,f,g,h,i,j]
 
+logFile = 'output.log'
+logLevel = log.INFO
+log.basicConfig(filename=logFile,level=logLevel)
+
 def diceRolling(input):
     try:
         log.info("Rolling: " +input)
