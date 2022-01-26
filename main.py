@@ -114,9 +114,9 @@ async def system(ctx, *args):
             if str(args[0]).lower() == "setlogging":
                 log.warning("Authenticating attempt to change logging level...")
                 if str(args[1]) == SYS_PASS:
-                    log.warning("Authentication successful.")
-                    log.setLevel(str(args[2]))
+                    log.warning("Authentication successful.")                    
                     out += "Logging level set to {0}".format(str(args[2]))
+                    log.Logger.setLevel(log.Logger,str(args[2]))
                 else:
                     log.warning("Auth fail.")
                     out += "Authentication failed, logging level unchanged."
