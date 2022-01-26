@@ -148,7 +148,7 @@ def diceRolling(input):
                 return "Reconsider this entry... and your life choices"
             output = compareOrDrop(results,mod,modNum)
             if(matches[2][0] == 'd'):
-                for x in results:
+                for x in output:
                     dropTotal += int(x)
                 return "Original rolls = "+ str(droppedOutput) +" After Dropping = " + str(output) + " Total = " + str(dropTotal)
             return output
