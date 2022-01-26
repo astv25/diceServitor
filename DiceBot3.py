@@ -218,5 +218,5 @@ def diceRolling(input):
         return groupCases(test)
 
     except Exception as e:
-        log.debug(str(e))
+        log.error(str(e))
 

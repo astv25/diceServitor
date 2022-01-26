@@ -9,7 +9,7 @@ from discord.ext import commands
 
 #Logfile
 logFile = 'output.log'
-logLevel = log.DEBUG #Possible values:  INFO,WARNING,ERROR,CRITICAL,DEBUG
+logLevel = log.ERROR #Possible values:  INFO,WARNING,ERROR,CRITICAL,DEBUG
 log.basicConfig(filename=logFile,level=logLevel)
 
 log.info("Dice Servitor initializing...")
@@ -100,13 +100,13 @@ async def rtchargen(ctx, *args):
 async def system(ctx, *args):
     async with ctx.typing():
         try:    
-            log.debug("System command invoked with arguments: {}".format(args))
+            log.warning("System command invoked with arguments: {}".format(args))
             out = ""
-            log.debug(args)
-            log.debug("Length of args: {}".format(len(args)))
+            log.warning(args)
+            log.warning("Length of args: {}".format(len(args)))
             if str(args[0]).lower() == "updateself":
                 if str(args[1]) == SYS_PASS:
-                    log.debug("Update authentication successful.")
+                    log.warning("Update authentication successful.")
                     await ctx.channel.send("Updating server side code...")
                     os.system('./botUpdate.sh')
                 else:
