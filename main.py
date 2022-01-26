@@ -1,12 +1,18 @@
 import discord
 import os
 import subprocess
+import logging as log
 #import dice_v2
 from xml.dom import minidom
 import DiceBot3
 from discord.ext import commands
 
-print("Dice Servitor initializing...")
+#Logfile
+logFile = 'output.log'
+logLevel = log.DEBUG #Possible values:  INFO,WARNING,ERROR,CRITICAL,DEBUG
+log.basicConfig(filename=logFile,level=logLevel)
+
+log.info("Dice Servitor initializing...")
 
 #Read config file
 configFile = 'config.xml'
@@ -15,6 +21,8 @@ config = minidom.parse(configFile)
 BOT_VERSION = config.getElementsByTagName('botVersion')[0].firstChild.data
 DISCORD_TOKEN = config.getElementsByTagName('discordToken')[0].firstChild.data
 SYS_PASS = config.getElementsByTagName('adminPassword')[0].firstChild.data
+
+log.info("Dice Servitor initialized.")
 
 bot = commands.Bot(command_prefix="!")
 
@@ -41,17 +49,17 @@ async def ping(ctx):
 async def roll(ctx, *args):
     async with ctx.typing():
         try:
-            print("Roll command invoked with arguments: {}".format(args))
+            log.info("Roll command invoked with arguments: {}".format(args))
             argument=""
             #Simplify/condense multiple arguments into a single var
             for arg in args:
                 argument += arg
-            print("Results of argument simplicication: {}".format(argument))
+            log.info("Results of argument simplicication: {}".format(argument))
             out = DiceBot3.diceRolling(argument)
             print(out)
             
         except Exception as e:
-            print(str(e))
+            log.error(str(e))
             out = "Unable to parse roll command, please refer to ``!help roll`` for syntax"
         message = ctx.author.mention + " " + str(out)
     await ctx.channel.send(message)
@@ -65,7 +73,7 @@ async def roll(ctx, *args):
 )
 async def rtchargen(ctx, *args):
     async with ctx.typing():
-        print("Character generation command invoked, arguments ignored.")
+        log.info("Character generation command invoked, arguments ignored.")
         characteristics=[]
         #EXTREME LAZINESS INCOMING
         characteristics.append(DiceBot3.diceRolling("2d10+25")[-2:])
@@ -92,13 +100,13 @@ async def rtchargen(ctx, *args):
 async def system(ctx, *args):
     async with ctx.typing():
         try:    
-            print("System command invoked with arguments: {}".format(args))
+            log.debug("System command invoked with arguments: {}".format(args))
             out = ""
-            print(args)
-            print("Length of args: {}".format(len(args)))
+            log.debug(args)
+            log.debug("Length of args: {}".format(len(args)))
             if str(args[0]).lower() == "updateself":
                 if str(args[1]) == SYS_PASS:
-                    print("Update authentication successful.")
+                    log.debug("Update authentication successful.")
                     await ctx.channel.send("Updating server side code...")
                     os.system('./botUpdate.sh')
                 else:
@@ -113,5 +121,3 @@ async def system(ctx, *args):
     await ctx.channel.send(message)
 
 bot.run(DISCORD_TOKEN)
-
-print("Dice Servitor initialized.")

@@ -2,7 +2,7 @@ import math
 import random
 import re #([\d]+)d([\d]+)([><d+-/*]?[=l]?)([\d]+)?([+-/*\d]+)?(#.+)?
 
-
+#Test cases:
 a = "1D100"
 b = "1d100>50"
 c = "1d100<=50"
@@ -17,7 +17,7 @@ testCases =[a,b,c,d,e,f,g,h,i,j]
 
 def diceRolling(input):
     try:
-        print("Rolling: " +input)
+        log.info("Rolling: " +input)
         input = input.lower().strip() #basic formatting
         pattern_d = re.compile('([\d]+)d([\d]+)([><d]?[=l]?)([\d]+)?([+-/*\d]+)?(#.+)?')
         matches = pattern_d.split(input)
@@ -54,7 +54,7 @@ def diceRolling(input):
             if mod == 'dl':
                 print("Rolled: " + str(origrolls))
                 index=1
-                tmprolls
+                tmprolls=[]
                 tmprolls.append(rolls)
                 tmprolls.sort()
                 while index <= num:
@@ -217,5 +217,5 @@ def diceRolling(input):
         return groupCases(test)
 
     except Exception as e:
-        print(str(e))
+        log.debug(str(e))
 
