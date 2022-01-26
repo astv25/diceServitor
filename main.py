@@ -9,7 +9,7 @@ from discord.ext import commands
 
 #Logfile
 logFile = 'output.log'
-logLevel = log.ERROR #Possible values:  INFO,WARNING,ERROR,CRITICAL,DEBUG
+logLevel = log.INFO #Possible values:  INFO,WARNING,ERROR,CRITICAL,DEBUG
 log.basicConfig(filename=logFile,level=logLevel)
 
 log.info("Dice Servitor initializing...")

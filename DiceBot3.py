@@ -60,7 +60,7 @@ def diceRolling(input):
                 print("Rolled: " + str(origrolls))
                 index=1
                 tmprolls=[]
-                tmprolls.append(rolls)
+                tmprolls.extend(rolls)
                 tmprolls.sort()
                 while index <= num:
                     dropped.append(tmprolls[0])
