@@ -111,11 +111,21 @@ async def system(ctx, *args):
                     os.system('./botUpdate.sh')
                 else:
                     out += "Self update authentication failed"
+            if str(args[0]).lower() == "setlogging":
+                log.warning("Authenticating attempt to change logging level...")
+                if str(args[1]) == SYS_PASS:
+                    log.warning("Authentication successful.")
+                    log.setLevel(str(args[2]))
+                    out += "Logging level set to {0}".format(str(args[2]))
+                else:
+                    log.warning("Auth fail.")
+                    out += "Authentication failed, logging level unchanged."
             if str(args[0]).lower() == "getversion":
                 out += "Dice Servitor version: {}".format(BOT_VERSION)
             if str(args[0]).lower() == "getshard":
                 out += subprocess.getoutput('wget -q -O - http://169.254.169.254/latest/meta-data/instance-id')
         except Exception as e:
+            log.error(e)
             out += "Exception in system: {}".format(e)
         message = ctx.author.mention + " " + str(out)
     await ctx.channel.send(message)
