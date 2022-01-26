@@ -1,5 +1,6 @@
 import math
 import random
+import logging as log
 import re #([\d]+)d([\d]+)([><d+-/*]?[=l]?)([\d]+)?([+-/*\d]+)?(#.+)?
 
 #Test cases:
