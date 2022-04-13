@@ -1,26 +1,26 @@
-import discord
 import os
 import subprocess
 import logging as log
-#import dice_v2
 from xml.dom import minidom
 import DiceBot3
 from discord.ext import commands
 
-#Logfile
+#BEGIN Logfile
 logFile = 'output.log'
 logLevel = log.INFO #Possible values:  INFO,WARNING,ERROR,CRITICAL,DEBUG
 log.basicConfig(filename=logFile,level=logLevel)
+#END Logfile
 
 log.info("Dice Servitor initializing...")
 
-#Read config file
+#BEGIN config file
 configFile = 'config.xml'
 os.chdir('/root/diceServitor')
 config = minidom.parse(configFile)
 BOT_VERSION = config.getElementsByTagName('botVersion')[0].firstChild.data
 DISCORD_TOKEN = config.getElementsByTagName('discordToken')[0].firstChild.data
 SYS_PASS = config.getElementsByTagName('adminPassword')[0].firstChild.data
+#END config file
 
 log.info("Dice Servitor initialized.")
 
@@ -75,16 +75,8 @@ async def rtchargen(ctx, *args):
     async with ctx.typing():
         log.info("Character generation command invoked, arguments ignored.")
         characteristics=[]
-        #EXTREME LAZINESS INCOMING
-        characteristics.append(DiceBot3.diceRolling("2d10+25")[-2:])
-        characteristics.append(DiceBot3.diceRolling("2d10+25")[-2:])
-        characteristics.append(DiceBot3.diceRolling("2d10+25")[-2:])
-        characteristics.append(DiceBot3.diceRolling("2d10+25")[-2:])
-        characteristics.append(DiceBot3.diceRolling("2d10+25")[-2:])
-        characteristics.append(DiceBot3.diceRolling("2d10+25")[-2:])
-        characteristics.append(DiceBot3.diceRolling("2d10+25")[-2:])
-        characteristics.append(DiceBot3.diceRolling("2d10+25")[-2:])
-        characteristics.append(DiceBot3.diceRolling("2d10+25")[-2:])
+        for x in range(7):
+            characteristics.append(DiceBot3.diceRolling("2d10+25")[-2:])
         optreplace = DiceBot3.diceRolling("2d10+25")[-2:]
         wounds = DiceBot3.diceRolling("1d5")[0]
         fate = DiceBot3.diceRolling("1d10")[0]
@@ -94,6 +86,7 @@ async def rtchargen(ctx, *args):
         out += "  Fate Roll:  {}".format(fate)
         message = ctx.author.mention + " " + str(out)
     await ctx.channel.send(message)
+
 @bot.command (hidden=True)
 @commands.has_role('DS-Developer')
 
