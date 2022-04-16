@@ -158,7 +158,8 @@ async def custrole(ctx, *args):
                 log.warning("Collapsing arguments into status string...")
                 i = 1
                 tmpargstr = ""
-                tmpargs = args
+                tmpargs = []
+                tmpargs.append(args)
                 tmpargs.pop(0)
                 for arg in tmpargs:
                     tmpargstr += "{} ".format(arg)                
