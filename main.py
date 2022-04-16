@@ -1,4 +1,5 @@
 import os
+from re import A
 import subprocess
 import logging as log
 from xml.dom import minidom
@@ -22,11 +23,6 @@ BOT_VERSION = config.getElementsByTagName('botVersion')[0].firstChild.data
 DISCORD_TOKEN = config.getElementsByTagName('discordToken')[0].firstChild.data
 SYS_PASS = config.getElementsByTagName('adminPassword')[0].firstChild.data
 #END Config File
-
-#BEGIN Custom status
-activity = discord.Activity(name='the meatbags suffer.', type=discord.ActivityType.watching)
-client = discord.Client(activity=activity)
-#END Custom status
 
 log.info("Dice Servitor initialized.")
 
@@ -97,7 +93,8 @@ async def rtchargen(ctx, *args):
     await ctx.channel.send(message)
 
 #System
-@bot.command (hidden=True,
+@bot.command (
+    hidden=True,
     help = """Provides access to internal bot systems, sometimes via password authentication
               UpdateSelf [password]         - access DiceServitor github repo and preform a server-side self update
               SetLogging [password] [level] - set server-side output.log logging level to:  INFO, WARNING, ERROR, CRITICAL, DEBUG.  Default is INFO
@@ -136,6 +133,39 @@ async def system(ctx, *args):
         except Exception as e:
             log.error(e)
             out += "Exception in system: {}".format(e)
+        message = ctx.author.mention + " " + str(out)
+    await ctx.channel.send(message)
+
+#Custom Status
+@bot.command (
+    hidden=True,
+    help = """Set the bot's custom status
+              custrole [password] [status]"""
+)
+@commands.has_role('DS-Developer')
+
+async def custrole(ctx, *args):
+    async with ctx.typing():
+        try:
+            log.warning("Change status command invoked with arguments: {}".format(args))
+            out = ""
+            log.warning(args)
+            log.warning("Length of args: {}".format(len(args)))
+            log.warning("Authenticating attempt to change role...")
+            if (str(args[0]) == SYS_PASS):
+                log.warning("Authentication successful")
+                log.warning("Changing custom status...")
+                log.warning("Collapsing arguments into status string...")
+                i = 1
+                tmpargstr = ""
+                for i in len(args):
+                    tmpargstr += "{} ".format(args[i])                
+                activity = discord.Activity(name=tmpargstr)
+                client = discord.Client()
+                client.change_presence(activity=activity)
+        except Exception as e:
+            log.error(e)
+            out += "Exception in custrole: {}".format(e)
         message = ctx.author.mention + " " + str(out)
     await ctx.channel.send(message)
 
