@@ -26,6 +26,7 @@ log.info("Dice Servitor initialized.")
 
 bot = commands.Bot(command_prefix="!")
 
+#Ping
 @bot.command(
     help = "Responds with 'pong'!",
     brief = "Responds with 'pong'!"
@@ -33,6 +34,7 @@ bot = commands.Bot(command_prefix="!")
 async def ping(ctx):
     await ctx.channel.send("pong")
 
+#Roll
 @bot.command(
     help = """Rolls dice.  Supports Target Number, +/- modification, and drop lowest.
               The command doesn't care about spacing, but any malformed arguments will throw it off. :(
@@ -64,6 +66,7 @@ async def roll(ctx, *args):
         message = ctx.author.mention + " " + str(out)
     await ctx.channel.send(message)
 
+#Rtchargen
 @bot.command(
     help = """Does the basic rolls for creating a Rogue Trader character all at once.
               Rolls 9x 2d10+25 for characteristics plus an additional, optional replacment
@@ -87,7 +90,14 @@ async def rtchargen(ctx, *args):
         message = ctx.author.mention + " " + str(out)
     await ctx.channel.send(message)
 
-@bot.command (hidden=True)
+#System
+@bot.command (hidden=True
+    help = """Provides access to internal bot systems, sometimes via password authentication
+              UpdateSelf [password]         - access DiceServitor github repo and preform a server-side self update
+              SetLogging [password] [level] - set server-side output.log logging level to:  INFO, WARNING, ERROR, CRITICAL, DEBUG.  Default is INFO
+              GetVersion                    - return version as shown in config.xml
+              GetShard                      - return AWS instance ID, which only works if the bot is running on AWS""",
+    brief = "System command.  Can require authentication.")
 @commands.has_role('DS-Developer')
 
 async def system(ctx, *args):
