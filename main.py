@@ -158,8 +158,9 @@ async def custrole(ctx, *args):
                 log.warning("Collapsing arguments into status string...")
                 i = 1
                 tmpargstr = ""
-                for i in len(args):
-                    tmpargstr += "{} ".format(args[i])                
+                for arg in args:
+                    tmpargstr += "{} ".format(arg)                
+                    i += 1
                 activity = discord.Activity(name=tmpargstr)
                 client = discord.Client()
                 client.change_presence(activity=activity)
