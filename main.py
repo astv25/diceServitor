@@ -3,6 +3,7 @@ import subprocess
 import logging as log
 from xml.dom import minidom
 import DiceBot3
+import discord
 from discord.ext import commands
 
 #BEGIN Logfile
@@ -13,14 +14,19 @@ log.basicConfig(filename=logFile,level=logLevel)
 
 log.info("Dice Servitor initializing...")
 
-#BEGIN config file
+#BEGIN Config File
 configFile = 'config.xml'
 os.chdir('/root/diceServitor')
 config = minidom.parse(configFile)
 BOT_VERSION = config.getElementsByTagName('botVersion')[0].firstChild.data
 DISCORD_TOKEN = config.getElementsByTagName('discordToken')[0].firstChild.data
 SYS_PASS = config.getElementsByTagName('adminPassword')[0].firstChild.data
-#END config file
+#END Config File
+
+#BEGIN Custom status
+activity = discord.Activity(name='the meatbags suffer.', type=discord.ActivityType.watching)
+client = discord.Client(activity=activity)
+#END Custom status
 
 log.info("Dice Servitor initialized.")
 
