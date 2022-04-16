@@ -161,9 +161,11 @@ async def custrole(ctx, *args):
                 for arg in args:
                     tmpargstr += "{} ".format(arg)                
                     i += 1
-                activity = discord.Activity(name=tmpargstr)
-                client = discord.Client()
-                client.change_presence(activity=activity)
+                log.warning("Arguments collapsed into status string.")
+                log.warning("Status string: {}".format(tmpargstr))
+                activity = discord.Activity(name=tmpargstr, type=discord.ActivityType.watching)                
+                await bot.change_presence(activity=activity)
+                log.warning("Custom status updated.")
         except Exception as e:
             log.error(e)
             out += "Exception in custrole: {}".format(e)
