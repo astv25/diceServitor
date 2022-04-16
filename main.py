@@ -97,7 +97,7 @@ async def rtchargen(ctx, *args):
     await ctx.channel.send(message)
 
 #System
-@bot.command (hidden=True
+@bot.command (hidden=True,
     help = """Provides access to internal bot systems, sometimes via password authentication
               UpdateSelf [password]         - access DiceServitor github repo and preform a server-side self update
               SetLogging [password] [level] - set server-side output.log logging level to:  INFO, WARNING, ERROR, CRITICAL, DEBUG.  Default is INFO
