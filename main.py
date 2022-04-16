@@ -159,7 +159,8 @@ async def custrole(ctx, *args):
                 i = 1
                 tmpargstr = ""
                 tmpargs = []
-                tmpargs.append(args)
+                for arg in args:
+                    tmpargs.append(arg)
                 tmpargs.pop(0)
                 for arg in tmpargs:
                     tmpargstr += "{} ".format(arg)                
