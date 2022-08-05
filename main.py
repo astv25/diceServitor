@@ -80,7 +80,7 @@ async def rtchargen(ctx, *args):
     async with ctx.typing():
         log.info("Character generation command invoked, arguments ignored.")
         characteristics=[]
-        for x in range(7):
+        for x in range(9):
             characteristics.append(DiceBot3.diceRolling("2d10+25")[-2:])
         optreplace = DiceBot3.diceRolling("2d10+25")[-2:]
         wounds = DiceBot3.diceRolling("1d5")[0]
