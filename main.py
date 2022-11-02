@@ -21,8 +21,10 @@ log.info("Dice Servitor initializing...")
 
 #BEGIN Config File
 configFile = 'config.xml'
+
 def readConfig(element):
     return config.getElementsByTagName(element)[0].firstChild.data
+
 if platform.system() == 'Linux':
     os.chdir('/root/diceServitor')
 config = minidom.parse(configFile)
@@ -32,6 +34,29 @@ SQL_USER = readConfig('sqlUser')
 SQL_PASS = readConfig('sqlPass')
 SQL_SERV = readConfig('sqlServ')
 #END Config File
+
+#BEGIN Config Checks
+if DISCORD_TOKEN != None:
+    log.info("Token loaded from config.")
+else:
+    log.error("Token not loaded!")
+if SYS_PASS != None:
+    log.info("System password loaded from config.")
+else:
+    log.error("System password not loaded!")
+if SQL_USER !=None:
+    log.info("SQL database username loaded from config.")
+else:
+    log.error("SQL database username not loaded!")
+if SQL_PASS !=None:
+    log.info("SQL database password loaded from config.")
+else:
+    log.error("SQL database password not loaded!")
+if SQL_SERV != None:
+    log.info("SQL server IP/hostname loaded from config.")
+else:
+    log.error("SQL server IP/hostname not loaded!")
+#END Config Checks
 
 log.info("Dice Servitor initialized.")
 
@@ -61,8 +86,8 @@ async def ping(inter):
                        roll 3d10dl2      will roll 3 d10 and remove the lowest 2 die.""",
     brief = "Rolls dice"
 )
-async def roll(inter, *args):
-    async with inter.typing():
+async def roll(inter, args:str):
+    async with inter.channel.typing():
         try:
             log.info("Roll command invoked with arguments: {}".format(args))
             argument=""
@@ -81,14 +106,15 @@ async def roll(inter, *args):
 
 #Rtchargen
 @bot.slash_command(
+    name = "rtchargen",
     help = """Does the basic rolls for creating a Rogue Trader character all at once.
               Rolls 9x 2d10+25 for characteristics plus an additional, optional replacment
               Rolls 1d5 for wounds
               Rolls 1d10 for fate""",
-    brief = "Rolls dice for Rogue Trader chargen"
+    description = "Rolls dice for Rogue Trader chargen"
 )
 async def rtchargen(inter, *args):
-    async with inter.typing():
+    async with inter.channel.typing():
         log.info("Character generation command invoked, arguments ignored.")
         characteristics=[]
         for x in range(9):
@@ -115,7 +141,7 @@ async def rtchargen(inter, *args):
 @commands.has_role('DS-Developer')
 
 async def system(inter, *args):
-    async with inter.typing():
+    async with inter.channel.typing():
         try:    
             log.warning("System command invoked with arguments: {}".format(args))
             out = ""
@@ -152,7 +178,7 @@ async def system(inter, *args):
 @commands.has_role('DS-Developer')
 
 async def custrole(inter, *args):
-    async with inter.typing():
+    async with inter.channel.typing():
         try:
             log.warning("Change status command invoked with arguments: {}".format(args))
             out = ""
@@ -189,7 +215,7 @@ async def custrole(inter, *args):
 )
 
 async def initdb(inter):
-    async with inter.typing():
+    async with inter.channel.typing():
         log.info("initDB command invoked")
         log.info("Connecting to MYSQL backend...")
         dbquerybase = "CREATE DATABASE {}"
@@ -210,7 +236,7 @@ async def initdb(inter):
         except Error as e:
             log.error(e)
             out = "Error creating database."
-            await inter.channel.send(out)
+    await inter.channel.send(out)
 
 @bot.slash_command(
     hidden=True,
@@ -218,7 +244,7 @@ async def initdb(inter):
 )
 
 async def inittable(inter):
-    async with inter.typing():
+    async with inter.channel.typing():
         log.info("Connecting to MYSQL backend...")
         dbid = "{}_sheets"
         dbid = dbid.format(inter.guild.id)
@@ -252,14 +278,14 @@ CREATE TABLE actors(
         except Error as e:
             log.error(e)
             out = "Error creating table."
-            await inter.channel.send(out)
+    await inter.channel.send(out)
 
 @bot.slash_command (
     help = "Add a character by specifying Name and attributes"
 )
 
 async def addcharacter(inter, *args):
-    async with inter.typing():
+    async with inter.channel.typing():
         log.info("Connecting to MYSQL backend...")
         out = ""
         dbid = "{}_sheets"
@@ -296,14 +322,14 @@ async def addcharacter(inter, *args):
             log.error(e)
             out += "Error creating character entry."
         message = inter.author.mention + " " + str(out)
-        await inter.channel.send(message)
+    await inter.channel.send(message)
 
 @bot.slash_command(
     help = "Retrieve a characteristic from a character whose data is stored and roll against it."
 )
 
 async def rollcharacteristic(inter, *args):
-    async with inter.typing():
+    async with inter.channel.typing():
         log.info("rollCharacteristic command invoked with arguments: {}".format(args))
         log.info("Connecting to MYSQL backend...")
         out = ""
@@ -360,11 +386,11 @@ async def rollcharacteristic(inter, *args):
                 roll = roll.format(rollMod)
                 rollOut = DiceBot3.diceRolling(roll)
                 out = rollOut
-        except (Error, Exception) as e:
+        except (Exception) as e:
             log.error(e)
             out = "Error: {}".format(e)
 
         message = inter.author.mention + " " + str(out)
-        await inter.channel.send(message)
+    await inter.channel.send(message)
 
 bot.run(DISCORD_TOKEN)
