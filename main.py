@@ -4,8 +4,10 @@ import subprocess
 import logging as log
 from xml.dom import minidom
 import DiceBot3
-import discord
-from discord.ext import commands
+# import discord
+# from discord.ext import commands
+import disnake
+from disnake.ext import commands
 
 #BEGIN Logfile
 logFile = 'output.log'
@@ -26,7 +28,8 @@ SYS_PASS = config.getElementsByTagName('adminPassword')[0].firstChild.data
 
 log.info("Dice Servitor initialized.")
 
-bot = commands.Bot(command_prefix="!")
+# bot = commands.Bot(command_prefix="!")
+bot = commands.InteractionBot(test_guilds=[826534172079554581])
 
 #Ping
 @bot.command(
@@ -35,6 +38,11 @@ bot = commands.Bot(command_prefix="!")
 )
 async def ping(ctx):
     await ctx.channel.send("pong")
+
+#Slash Command Ping
+@bot.slash_command()
+async def Sping(inter):
+    await inter.response.send_message("Spong!")
 
 #Roll
 @bot.command(
