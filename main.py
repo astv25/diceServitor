@@ -9,7 +9,7 @@ import DiceBot3
 #from discord.ext import commands
 import disnake
 from disnake.ext import commands
-#from mysql.connector import connect, Error
+from mysql.connector import connect, Error
 
 #BEGIN Logfile
 logFile = 'output.log'
@@ -200,7 +200,7 @@ async def custrole(inter, *args):
                     i += 1
                 log.warning("Arguments collapsed into status string.")
                 log.warning("Status string: {}".format(tmpargstr))
-                activity = discord.Activity(name=tmpargstr, type=discord.ActivityType.watching)                
+                activity = disnake.Activity(name=tmpargstr, type=disnake.ActivityType.watching)
                 await bot.change_presence(activity=activity)
                 log.warning("Custom status updated.")
         except Exception as e:
