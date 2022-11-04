@@ -11,7 +11,9 @@ import DiceBot3
 #from discord.ext import commands
 import disnake
 from disnake.ext import commands
-from mysql.connector import connect, Error
+#from mysql.connector import connect, Error
+import sqlite3
+from sqlite3 import Error
 
 
 #BEGIN Logfile
@@ -33,9 +35,7 @@ if platform.system() == 'Linux':
 config = minidom.parse(configFile)
 DISCORD_TOKEN = readConfig('discordToken')
 SYS_PASS = readConfig('adminPassword')
-SQL_USER = readConfig('sqlUser')
-SQL_PASS = readConfig('sqlPass')
-SQL_SERV = readConfig('sqlServ')
+SQL_FOLD = readConfig('sqlFolder')
 #END Config File
 
 #BEGIN Config Checks
@@ -47,18 +47,10 @@ if SYS_PASS != None:
     log.info("System password loaded from config.")
 else:
     log.error("System password not loaded!")
-if SQL_USER !=None:
-    log.info("SQL database username loaded from config.")
+if SQL_FOLD != None:
+    log.info("SQLite folder path loaded!")
 else:
-    log.error("SQL database username not loaded!")
-if SQL_PASS !=None:
-    log.info("SQL database password loaded from config.")
-else:
-    log.error("SQL database password not loaded!")
-if SQL_SERV != None:
-    log.info("SQL server IP/hostname loaded from config.")
-else:
-    log.error("SQL server IP/hostname not loaded!")
+    log.error("SQLite folder path not loaded!")
 #END Config Checks
 
 log.info("Dice Servitor initialized.")
@@ -123,16 +115,14 @@ async def rtchargen(inter, *args):
         out += "  Wounds Roll:  {}".format(wounds)
         out += "  Fate Roll:  {}".format(fate)
         message = inter.author.mention + " " + str(out)
-    await inter.channel.send(message)
+    await inter.response.send_message(message)
 
 # #System
 @bot.slash_command (
     hidden=True,
     help = """Provides access to internal bot systems, sometimes via password authentication
               UpdateSelf [password]         - access DiceServitor github repo and preform a server-side self update
-              SetLogging [password] [level] - set server-side output.log logging level to:  INFO, WARNING, ERROR, CRITICAL, DEBUG.  Default is INFO
-              GetVersion                    - return version as shown in config.xml
-              GetShard                      - return AWS instance ID, which only works if the bot is running on AWS""",
+              SetLogging [password] [level] - set server-side output.log logging level to:  INFO, WARNING, ERROR, CRITICAL, DEBUG.  Default is INFO""",
     brief = "System command.  Can require authentication.")
 @commands.has_role('DS-Developer')
 
@@ -205,34 +195,44 @@ async def custrole(inter, *args):
         message = inter.author.mention + " " + str(out)
     await inter.channel.send(message)
 
+def builddbpath(dbidRaw):
+    log.info("Building database path...")
+    dbpath = os.getcwd()
+    dbpath += "\\{}".format(SQL_FOLD)
+    if not os.path.exists(dbpath):
+        log.info("{} folder does not exist.".format(SQL_FOLD))
+        log.info("Creating {} folder...".format(SQL_FOLD))
+        os.mkdir(SQL_FOLD)
+    dbid = "{}_sheets.sqlite.db".format(dbidRaw)
+    dbpath += "\\{}".format(dbid)
+    log.info("Database path built: {}".format(dbpath))
+    return dbpath
+
 @bot.slash_command(
     hidden=True,
-    help = "Initialize a server-specific database and character sheet table"
+    help = "Initialize a server-specific database"
 )
 
 async def initdb(inter):
     async with inter.channel.typing():
-        log.info("initDB command invoked")
-        log.info("Connecting to MYSQL backend...")
-        dbquerybase = "CREATE DATABASE {}"
-        dbid = "{}_sheets"
-        dbid = dbid.format(inter.guild.id)
+        out = ""
+        log.info("initdb command invoked.")
+        dbpath = builddbpath(inter.guild.id)
+        dbid = "{}_sheets.sqlite.db".format(inter.guild.id)
+        
+        conn = None
+
         try:
-            with connect(
-                host = "localhost",
-                user = SQL_USER,
-                password = SQL_PASS,
-                ) as connection:
-                dbquery = dbquerybase.format(dbid)
-                with connection.cursor() as cursor:
-                    cursor.execute(dbquery)
-            out = "Database {} created successfully.".format(dbid)
-            log.info(out)
-            await inter.channel.send(out)
+            conn = sqlite3.connect(dbpath)
+            log.info("Connected to database {}".format(dbid))
+            out += "Database {} created successfully.".format(dbid)
         except Error as e:
             log.error(e)
-            out = "Error creating database."
-    await inter.channel.send(out)
+            out += "Exception in initdb: {}".format(e)
+        if conn:
+            conn.close()
+        message = inter.author.mention + " " + str(out)
+    await inter.response.send_message(message)   
 
 @bot.slash_command(
     hidden=True,
@@ -241,96 +241,107 @@ async def initdb(inter):
 
 async def inittable(inter):
     async with inter.channel.typing():
-        log.info("Connecting to MYSQL backend...")
-        dbid = "{}_sheets"
-        dbid = dbid.format(inter.guild.id)
+        out = ""
+        log.info("inittable command invoked.")
+        log.info("Connecting to sqlite database...")
+        dbpath = builddbpath(inter.guild.id)
+        dbid = "{}_sheets.sqlite.db".format(inter.guild.id)
+
         tablequery = """
 CREATE TABLE actors(
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100),
-    weaponSkill VARCHAR(3),
-    ballisticSkill VARCHAR(3),
-    strength VARCHAR(3),
-    toughness VARCHAR(3),
-    agility VARCHAR(3),
-    intelligence VARCHAR(3),
-    perception VARCHAR(3),
-    willpower VARCHAR(3),
-    fellowship VARCHAR(3)
+    id integer PRIMARY KEY,
+    playerid integer NOT NULL,
+    name text NOT NULL,
+    weaponSkill integer NOT NULL,
+    ballisticSkill integer NOT NULL,
+    strength integer NOT NULL,
+    toughness integer NOT NULL,
+    agility integer NOT NULL,
+    intelligence integer NOT NULL,
+    perception integer NOT NULL,
+    willpower integer NOT NULL,
+    fellowship integer NOT NULL
 )
 """
         try:
-            with connect(
-                host = "localhost",
-                user = SQL_USER,
-                password = SQL_PASS,
-                database = dbid,
-                ) as connection:
-                with connection.cursor() as cursor:
-                    cursor.execute(tablequery)
-            out = "Character sheet table created successfully in database {}".format(dbid)
-            log.info(out)
-            await inter.channel.send(out)
+            conn = sqlite3.connect(dbpath)
+            log.info("Connected to database {}".format(dbid))
+            cursor = conn.cursor()
+            log.info("Creating table 'actors'...")
+            cursor.execute(tablequery)
         except Error as e:
             log.error(e)
-            out = "Error creating table."
-    await inter.channel.send(out)
+            out = "Error creating table: {}".format(e)
+        if conn:
+            conn.close()
+        message = inter.author.mention + " " + str(out)
+    await inter.response.send_message(message)
 
 @bot.slash_command (
     help = "Add a character by specifying Name and attributes"
 )
 
-async def addcharacter(inter, *args):
+async def addcharacter(inter, name:str, weaponskill:int, ballisticskill:int, strength:int, toughness:int, agiilty:int, intelligence:int, perception:int, willpower:int, fellowship:int):
     async with inter.channel.typing():
-        log.info("Connecting to MYSQL backend...")
+        log.info("addcharacter command invoked.")
         out = ""
-        dbid = "{}_sheets"
-        dbid = dbid.format(inter.guild.id)
-        actorquerybase = "INSERT INTO actors (name, weaponSkill, ballisticSkill, strength, toughness, agility, intelligence, perception, willpower, fellowship) VALUES (\"{}\", {}, {}, {}, {}, {}, {}, {}, {}, {})"
-        #Sanity check arguments
-        try:
-            if len(args) < 10:
-                out += "Insufficient parameters supplied."
-                raise out
-            if len(args[0]) > 100:
-                out += "Name parameter too long."
-                raise Exception(out)
-            for a in args[1:]:
-                if len(a) > 3:
-                    out += "One or more characteristic parameters is too long."
-                    raise Exception(out)
-            #Sanity check pass
-            actorquery = actorquerybase.format(args[0],args[1],args[2],args[3],args[4],args[5],args[6],args[7],args[8],args[9])
+        dbpath = builddbpath(inter.guild.id)
+        dbid = "{}_sheets.sqlite.db".format(inter.guild.id)
+        playername = inter.user.name
+        playerid = inter.user.id
+
+        actorquerybase = "INSERT INTO actors (playerid, name, weaponSkill, ballisticSkill, strength, toughness, agility, intelligence, perception, willpower, fellowship) VALUES ({}, \"{}\", {}, {}, {}, {}, {}, {}, {}, {}, {})"
+        
+        try:            
+            conn = sqlite3.connect(dbpath)
+            log.info("Connected to database {}".format(dbid))
+            cursor = conn.cursor()
+            log.info("Checking to see if player {}({}) has character slots.".format(playername, playerid))
+            cursor.execute("SELECT * FROM actors WHERE playerid={}".format(playerid))
+            data = cursor.fetchall()
+            if len(data)<3:
+                log.info("Player {}({}) has character slots.".format(playername, playerid))
+            else:                
+                raise Error("Player {} has used all available character slots.".format(playername))
+            log.info("Checking if character {} exists for player {}({})".format(name, playername, playerid))
+            cursor.execute("SELECT * FROM actors WHERE playerid={} AND name=\"{}\"".format(playerid, name))
+            data = cursor.fetchall()
+            if len(data)>0:
+                log.info("Character {} exists for player {}({})".format(name, playername,playerid))                
+                raise Error("Character {} exists!  To modify an existing character use /modcharacter".format(name))
+            actorquery = actorquerybase.format(playerid, name, weaponskill, ballisticskill, strength, toughness, agiilty, intelligence, perception, willpower, fellowship)
             log.info("Attempting the following SQL query:")
             log.info(actorquery)
-            with connect(
-                host = "localhost",
-                user = SQL_USER,
-                password = SQL_PASS,
-                database = dbid,
-                ) as connection:
-                with connection.cursor() as cursor:
-                    cursor.execute(actorquery)
-                    connection.commit()
-            out += "Character entry '{}' created successfully.".format(args[0])
-            log.info(out)
+            log.info("Executing query...")
+            cursor.execute(actorquery)
+            conn.commit()
+            log.info("Confirming query processed successfully...")
+            cursor.execute("SELECT * FROM actors WHERE name=\"{}\"".format(name))
+            data = cursor.fetchall()
+            if len(data)>0:
+                log.info("Query processed successfully")
+            else:
+                raise Error("Character creation query failed:  no data returned for character {}".format(name))
+            out += "Character entry '{}' created successfully.".format(name)
+            log.info(out)            
         except Error as e:
             log.error(e)
-            out += "Error creating character entry."
+            out += "Error creating character entry: {}".format(e)
+        if conn:
+            conn.close()
         message = inter.author.mention + " " + str(out)
-    await inter.channel.send(message)
+    await inter.response.send_message(message)
 
 @bot.slash_command(
     help = "Retrieve a characteristic from a character whose data is stored and roll against it."
 )
 
-async def rollcharacteristic(inter, *args):
+async def rollcharacteristic(inter, name:str, attribute:str):
     async with inter.channel.typing():
-        log.info("rollCharacteristic command invoked with arguments: {}".format(args))
-        log.info("Connecting to MYSQL backend...")
+        log.info("rollCharacteristic command invoked with arguments")        
         out = ""
-        dbid = "{}_sheets"
-        dbid = dbid.format(inter.guild.id)
+        dbpath = builddbpath(inter.guild.id)
+        dbid = "{}_sheets.sqlite.db".format(inter.guild.id)
         allowedCharacteristic = ["weaponSkill","ballisticSkill","strength","toughness","agility","intelligence","perception","willpower","fellowship"]
         actorquerybase = "SELECT {} FROM actors WHERE name=\"{}\""
         #Determine the characteristic data to pull
