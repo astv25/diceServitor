@@ -5,11 +5,13 @@ import subprocess
 import logging as log
 from xml.dom import minidom
 import DiceBot3
+
 #import discord
 #from discord.ext import commands
 import disnake
 from disnake.ext import commands
 from mysql.connector import connect, Error
+
 
 #BEGIN Logfile
 logFile = 'output.log'
@@ -60,9 +62,11 @@ else:
 
 log.info("Dice Servitor initialized.")
 
+
 #bot = commands.Bot(command_prefix="!")
 #bot = commands.Bot(command_prefix=commands.when_mentioned)
 bot = commands.InteractionBot()
+
 
 #Ping
 @bot.slash_command(
@@ -71,6 +75,11 @@ bot = commands.InteractionBot()
 )
 async def ping(inter):
     await inter.channel.send("pong")
+
+#Slash Command Ping
+@bot.slash_command()
+async def Sping(inter):
+    await inter.response.send_message("Spong!")
 
 #Roll
 @bot.slash_command(
