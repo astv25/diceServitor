@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-<botVersion>MAJOR.MINOR.REVISION</botVersion>
 <discordToken>REPLACEME</discordToken>
 <adminPassword>SERIOUSLYREPLACEME</adminPassword>
+<sqlUser>REPLACEME</sqlUser>
+<sqlPass>REPLACEME</sqlPass>
+<sqlServ>IP_OR_HOSTNAME</sqlServ>
 </config>
