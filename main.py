@@ -1,3 +1,4 @@
+import asyncio
 import os
 import platform
 from re import A
@@ -62,60 +63,46 @@ else:
 
 log.info("Dice Servitor initialized.")
 
-
-#bot = commands.Bot(command_prefix="!")
-#bot = commands.Bot(command_prefix=commands.when_mentioned)
+# bot = commands.Bot(command_prefix="!")
 bot = commands.InteractionBot()
-
-
 #Ping
-@bot.slash_command(
-    help = "Responds with 'pong'!",
-    brief = "Responds with 'pong'!"
-)
-async def ping(inter):
-    await inter.channel.send("pong")
+# @bot.slash_command(
+#     help = "Responds with 'pong'!",
+#     brief = "Responds with 'pong'!"
+# )
+# async def ping(ctx):
+#     await ctx.channel.send("pong")
+
+#Slash Command Timer
+@bot.slash_command()
+async def timer(inter: disnake.ApplicationCommandInteraction, seconds: int):
+    await inter.response.send_message(f"Setting a timer for {seconds} seconds.")
+    await asyncio.sleep(seconds)
+    await inter.followup.send(f"{inter.author.mention}, your timer expired!")
 
 #Slash Command Ping
-@bot.slash_command()
-async def Sping(inter):
+@bot.slash_command(
+    name="sping",
+)
+async def sping(inter: disnake.ApplicationCommandInteraction):
     await inter.response.send_message("Spong!")
+
+#test input slash command
+@bot.slash_command(name="repeat",
+description="Repeats what is entered")
+async def repeat(inter, input: str):
+    await inter.response.send_message(input)
 
 #Roll
 @bot.slash_command(
-    help = """Rolls dice.  Supports Target Number, +/- modification, and drop lowest.
-              The command doesn't care about spacing, but any malformed arguments will throw it off. :(
-              Syntax:  roll 3d10#comment will roll 3 d10 with a comment (use underscores instead of spaces)
-                       roll 3d10+5       will roll 3 d10 and add 5 (Other supported math symbols include '-', '*', '/'.
-                                         Please note pemdas is not implemented. Use mdas as the input format)
-                       roll 1d100<=45    will roll 1 d100 and report each degree of success or failure for a roll <=45
-                       roll 1d100>=45    will roll 1 d100 and report each degree of success or failure for a roll >=45
-                       roll 1d100<45     will roll 1 d100 and report each degree of success or failure for a roll <45
-                       roll 1d100>45     will roll 1 d100 and report each degree of success or failure for a roll >45                        
-                       roll 3d10dl2      will roll 3 d10 and remove the lowest 2 die.""",
-    brief = "Rolls dice"
+    name="roll",
+    description= """Rolls dice. Syntax:  roll 3d10<=5#comment""",
 )
-async def roll(inter, args:str):
-    async with inter.channel.typing():
-        try:
-            log.info("Roll command invoked with arguments: {}".format(args))
-            argument=""
-            #Simplify/condense multiple arguments into a single var
-            for arg in args:
-                argument += arg
-            log.info("Results of argument simplicication: {}".format(argument))
-            out = DiceBot3.diceRolling(argument)
-            print(out)
-            
-        except Exception as e:
-            log.error(str(e))
-            out = "Unable to parse roll command, please refer to ``!help roll`` for syntax"
-        message = inter.author.mention + " " + str(out)
-    await inter.channel.send(message)
+async def roll(inter, input: str):
+    await inter.response.send_message("Rolling: " + input + '\n' + str(DiceBot3.diceRolling(input)))
 
-#Rtchargen
+# #Rtchargen
 @bot.slash_command(
-    name = "rtchargen",
     help = """Does the basic rolls for creating a Rogue Trader character all at once.
               Rolls 9x 2d10+25 for characteristics plus an additional, optional replacment
               Rolls 1d5 for wounds
@@ -138,7 +125,7 @@ async def rtchargen(inter, *args):
         message = inter.author.mention + " " + str(out)
     await inter.channel.send(message)
 
-#System
+# #System
 @bot.slash_command (
     hidden=True,
     help = """Provides access to internal bot systems, sometimes via password authentication
@@ -178,7 +165,7 @@ async def system(inter, *args):
         message = inter.author.mention + " " + str(out)
     await inter.channel.send(message)
 
-#Custom Status
+# #Custom Status
 @bot.slash_command (
     hidden=True,
     help = """Set the bot's custom status
