@@ -36,6 +36,7 @@ config = minidom.parse(configFile)
 DISCORD_TOKEN = readConfig('discordToken')
 SYS_PASS = readConfig('adminPassword')
 SQL_FOLD = readConfig('sqlFolder')
+DEV_SVID = readConfig('devServerID')
 #END Config File
 
 #BEGIN Config Checks
@@ -51,6 +52,10 @@ if SQL_FOLD != None:
     log.info("SQLite folder path loaded!")
 else:
     log.error("SQLite folder path not loaded!")
+if DEV_SVID != None:
+    log.info("Dev server ID loaded!")
+else:
+    log.error("Dev server ID not loaded!")
 #END Config Checks
 
 log.info("Dice Servitor initialized.")
@@ -91,6 +96,8 @@ async def repeat(inter, input: str):
     description= """Rolls dice. Syntax:  roll 3d10<=5#comment""",
 )
 async def roll(inter, input: str):
+    async with inter.channel.typing():
+        log.info("Roll command invoked by {}({}) with argument: {}".format(inter.author.name,inter.author.id,input))
     await inter.response.send_message("Rolling: " + input + '\n' + str(DiceBot3.diceRolling(input)))
 
 # #Rtchargen
@@ -101,9 +108,9 @@ async def roll(inter, input: str):
               Rolls 1d10 for fate""",
     description = "Rolls dice for Rogue Trader chargen"
 )
-async def rtchargen(inter, *args):
+async def rtchargen(inter):
     async with inter.channel.typing():
-        log.info("Character generation command invoked, arguments ignored.")
+        log.info("Character generation command invoked by {}({})".format(inter.author.name,inter.author.id))
         characteristics=[]
         for x in range(9):
             characteristics.append(DiceBot3.diceRolling("2d10+25")[-2:])
@@ -114,7 +121,7 @@ async def rtchargen(inter, *args):
         out += "  Optional replacement roll: {}".format(optreplace)
         out += "  Wounds Roll:  {}".format(wounds)
         out += "  Fate Roll:  {}".format(fate)
-        message = inter.author.mention + " " + str(out)
+        message = str(out)
     await inter.response.send_message(message)
 
 # #System
@@ -126,13 +133,14 @@ async def rtchargen(inter, *args):
     brief = "System command.  Can require authentication.")
 @commands.has_role('DS-Developer')
 
-async def system(inter, *args):
+async def system(inter, argument:str):
     async with inter.channel.typing():
+        args = argument.split(' ')
         try:    
-            log.warning("System command invoked with arguments: {}".format(args))
+            log.warning("System command invoked by {}({}) with arguments: {}".format(inter.author.name,inter.author.id,args))
             out = ""
-            log.warning(args)
-            log.warning("Length of args: {}".format(len(args)))
+            if inter.guild.id != int(DEV_SVID):
+                raise Exception("System cmmand received from unauthorized server!")            
             if str(args[0]).lower() == "updateself":
                 if str(args[1]) == SYS_PASS:
                     log.warning("Update authentication successful.")
@@ -152,8 +160,8 @@ async def system(inter, *args):
         except Exception as e:
             log.error(e)
             out += "Exception in system: {}".format(e)
-        message = inter.author.mention + " " + str(out)
-    await inter.channel.send(message)
+        message = str(out)
+    await inter.response.send_message(message)
 
 # #Custom Status
 @bot.slash_command (
@@ -163,10 +171,11 @@ async def system(inter, *args):
 )
 @commands.has_role('DS-Developer')
 
-async def custrole(inter, *args):
+async def custrole(inter, argument:str):
     async with inter.channel.typing():
+        args = argument.split(' ')
         try:
-            log.warning("Change status command invoked with arguments: {}".format(args))
+            log.warning("Change status command invoked by {}({}) with arguments: {}".format(inter.author.name,inter.author.id,args))
             out = ""
             log.warning(args)
             log.warning("Length of args: {}".format(len(args)))
@@ -216,7 +225,7 @@ def builddbpath(dbidRaw):
 async def initdb(inter):
     async with inter.channel.typing():
         out = ""
-        log.info("initdb command invoked.")
+        log.info("initdb command invoked by {}({}).".format(inter.author.name,inter.author.id))
         dbpath = builddbpath(inter.guild.id)
         dbid = "{}_sheets.sqlite.db".format(inter.guild.id)
         
@@ -230,6 +239,7 @@ async def initdb(inter):
             log.error(e)
             out += "Exception in initdb: {}".format(e)
         if conn:
+            log.info("Closing database connection.")
             conn.close()
         message = inter.author.mention + " " + str(out)
     await inter.response.send_message(message)   
@@ -242,7 +252,7 @@ async def initdb(inter):
 async def inittable(inter):
     async with inter.channel.typing():
         out = ""
-        log.info("inittable command invoked.")
+        log.info("inittable command invoked by {}({}).".format(inter.author.name,inter.author.name))
         log.info("Connecting to sqlite database...")
         dbpath = builddbpath(inter.guild.id)
         dbid = "{}_sheets.sqlite.db".format(inter.guild.id)
@@ -273,6 +283,7 @@ CREATE TABLE actors(
             log.error(e)
             out = "Error creating table: {}".format(e)
         if conn:
+            log.info("Closing database connection.")
             conn.close()
         message = inter.author.mention + " " + str(out)
     await inter.response.send_message(message)
@@ -283,12 +294,12 @@ CREATE TABLE actors(
 
 async def addcharacter(inter, name:str, weaponskill:int, ballisticskill:int, strength:int, toughness:int, agiilty:int, intelligence:int, perception:int, willpower:int, fellowship:int):
     async with inter.channel.typing():
-        log.info("addcharacter command invoked.")
+        log.info("addcharacter command invoked by {}({}) with arguments:  name {} WS {} BS {} STR {} TOU {} AGI {} INT {} PER {} WIL {} FEL {}.".format(inter.author.name,inter.author.id,name, weaponskill,ballisticskill,strength,toughness,agiilty,intelligence,perception,willpower,fellowship))
         out = ""
         dbpath = builddbpath(inter.guild.id)
         dbid = "{}_sheets.sqlite.db".format(inter.guild.id)
-        playername = inter.user.name
-        playerid = inter.user.id
+        playername = inter.author.name
+        playerid = inter.author.id
 
         actorquerybase = "INSERT INTO actors (playerid, name, weaponSkill, ballisticSkill, strength, toughness, agility, intelligence, perception, willpower, fellowship) VALUES ({}, \"{}\", {}, {}, {}, {}, {}, {}, {}, {}, {})"
         
@@ -318,27 +329,38 @@ async def addcharacter(inter, name:str, weaponskill:int, ballisticskill:int, str
             log.info("Confirming query processed successfully...")
             cursor.execute("SELECT * FROM actors WHERE name=\"{}\"".format(name))
             data = cursor.fetchall()
-            if len(data)>0:
-                log.info("Query processed successfully")
-            else:
-                raise Error("Character creation query failed:  no data returned for character {}".format(name))
+            validationSet = [name,weaponskill,ballisticskill,strength,toughness,agiilty,intelligence,perception,willpower,fellowship]
+            for item in validationSet:
+                if item in data[0]:
+                    continue
+                else:
+                    log.error("User input not found after actor creation!")
+                    log.error("Query:")
+                    log.error("SELECT * FROM actors WHERE name=\"{}\"".format(name))
+                    log.error("Output: ")
+                    log.error("{}".format(data))
+                    log.error("User Input: ")
+                    log.error("Name: {} WS: {} BS: {} STR: {} TOU: {} AGI: {} INT: {} PER: {} WIL: {} FEL: {}".format(name,weaponskill,ballisticskill,strength,toughness,agiilty,intelligence,perception,willpower,fellowship))
+                    raise Error("Validation error!  Expected data was missing.  See server-side debug log for details.")
+
             out += "Character entry '{}' created successfully.".format(name)
             log.info(out)            
         except Error as e:
             log.error(e)
             out += "Error creating character entry: {}".format(e)
         if conn:
+            log.info("Closing database connection.")
             conn.close()
-        message = inter.author.mention + " " + str(out)
+        message = str(out)
     await inter.response.send_message(message)
 
 @bot.slash_command(
     help = "Retrieve a characteristic from a character whose data is stored and roll against it."
 )
 
-async def rollcharacteristic(inter, name:str, attribute:str):
+async def rollcharacteristic(inter, name:str, attribute:str, modifier:str = None):
     async with inter.channel.typing():
-        log.info("rollCharacteristic command invoked with arguments")        
+        log.info("rollCharacteristic command invoked by {}({}) with arguments: {}".format(inter.author.name,inter.author.id,str(name + " " + attribute)))
         out = ""
         dbpath = builddbpath(inter.guild.id)
         dbid = "{}_sheets.sqlite.db".format(inter.guild.id)
@@ -346,37 +368,26 @@ async def rollcharacteristic(inter, name:str, attribute:str):
         actorquerybase = "SELECT {} FROM actors WHERE name=\"{}\""
         #Determine the characteristic data to pull
         try:
-            if len(args) == 0:
-                out += "Not enough arguments provided!  Need character name, characteristic to roll, and optionally a modifier"
-                raise Exception(out)
-            if len(args) <= 1:
-                out += "Not enough arguments provided!  Need character name, characteristic to roll, and optionally a modifier"
-                raise Exception(out)
-            if args[1] not in allowedCharacteristic:
-                out += "Characteristic unknown: {}".format(args[1])
-                raise Exception(out)
-            actorquery = actorquerybase.format(args[1],args[0])
-            log.info("Querying MYSQL database with the following:")
+            if attribute not in allowedCharacteristic:
+                out += "Characteristic unknown: {}".format(attribute)
+                raise Error(out)
+            actorquery = actorquerybase.format(attribute,name)
+            conn = sqlite3.connect(dbpath)
+            log.info("Connected to database: {}".format(dbid))
+            log.info("Querying database with the following:")
             log.info(actorquery)
-            with connect(
-                host = "localhost",
-                user = SQL_USER,
-                password = SQL_PASS,
-                database = dbid,
-                ) as connection:
-                with connection.cursor() as cursor:
-                    cursor.execute(actorquery)
-                    for data in cursor:
-                        stat = data[0]
+            cursor = conn.cursor()
+            cursor.execute(actorquery)
+            data = cursor.fetchall()
+            stat = data[0][0]
             stat = int(stat)
-            if len(args) == 2:
+            if not modifier:
                 roll = "1d100<={}"
                 roll = roll.format(stat)
                 rollOut = DiceBot3.diceRolling(roll)
                 out = rollOut
-            if len(args) >= 3:
-                roll = "1d100<={}"
-                modifier = args[2]
+            if modifier:
+                roll = "1d100<={}"                
                 log.info("Parsing modifier: {}".format(modifier))
                 log.info("Character at modifier[0]: {}".format(modifier[0]))
                 if modifier[0] == "+":
@@ -392,12 +403,15 @@ async def rollcharacteristic(inter, name:str, attribute:str):
                     raise Exception(out)
                 roll = roll.format(rollMod)
                 rollOut = DiceBot3.diceRolling(roll)
-                out = rollOut
+                out += "Character: {}, Statistic: {}, Modifier: {}".format(name,attribute,modifier) + '\n' + roll + '\n' + str(rollOut)
         except (Exception) as e:
             log.error(e)
             out = "Error: {}".format(e)
+        if conn:
+            log.info("Closing database connection.")
+            conn.close()
 
-        message = inter.author.mention + " " + str(out)
-    await inter.channel.send(message)
+        message = str(out)
+    await inter.response.send_message(message)
 
 bot.run(DISCORD_TOKEN)
