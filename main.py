@@ -169,7 +169,7 @@ async def rtchargen(inter):
 
 # #System
 @bot.slash_command (
-        guild_ids=[DEV_SVID],
+        guild_ids=[int(DEV_SVID)],
         hidden=True,
         help = """Provides access to internal bot systems, sometimes via password authentication
                   UpdateSelf [password]         - access DiceServitor github repo and preform a server-side self update
