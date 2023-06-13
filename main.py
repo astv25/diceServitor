@@ -60,22 +60,23 @@ else:
 
 log.info("Dice Servitor initialized.")
 
-# bot = commands.Bot(command_prefix="!")
-bot = commands.InteractionBot()
+#bot = commands.Bot(command_prefix="!")
+bot = commands.InteractionBot(sync_commands_debug=True)
+
 #Ping
-# @bot.slash_command(
-#     help = "Responds with 'pong'!",
-#     brief = "Responds with 'pong'!"
-# )
-# async def ping(ctx):
-#     await ctx.channel.send("pong")
+@bot.slash_command(
+    help = "Responds with 'pong'!",
+    brief = "Responds with 'pong'!"
+)
+async def ping(ctx):
+    await ctx.channel.send("pong")
 
 #Slash Command Timer
-@bot.slash_command()
-async def timer(inter: disnake.ApplicationCommandInteraction, seconds: int):
-    await inter.response.send_message(f"Setting a timer for {seconds} seconds.")
-    await asyncio.sleep(seconds)
-    await inter.followup.send(f"{inter.author.mention}, your timer expired!")
+# @bot.slash_command()
+# async def timer(inter: disnake.ApplicationCommandInteraction, seconds: int):
+#     await inter.response.send_message(f"Setting a timer for {seconds} seconds.")
+#     await asyncio.sleep(seconds)
+#     await inter.followup.send(f"{inter.author.mention}, your timer expired!")
 
 #Slash Command Ping
 @bot.slash_command(
@@ -84,29 +85,71 @@ async def timer(inter: disnake.ApplicationCommandInteraction, seconds: int):
 async def sping(inter: disnake.ApplicationCommandInteraction):
     await inter.response.send_message("Spong!")
 
-#test input slash command
-@bot.slash_command(name="repeat",
-description="Repeats what is entered")
-async def repeat(inter, input: str):
-    await inter.response.send_message(input)
+@bot.slash_command( description = "Shows descriptions of commands" )
+async def help(inter, command:str):
+    async with inter.channel.typing():
+        out = ""
+        if command.lower() == "roll":
+            out = """Rolls dice.  Supports Target Number, +/- modification, and drop lowest.
+              The command doesn't care about spacing, but any malformed arguments will throw it off. :(
+              Syntax:  roll 3d10#comment will roll 3 d10 with a comment (use underscores instead of spaces)
+                       roll 3d10+5       will roll 3 d10 and add 5 (Other supported math symbols include '-', '*', '/'.
+                                         Please note pemdas is not implemented. Use mdas as the input format)
+                       roll 1d100<=45    will roll 1 d100 and report each degree of success or failure for a roll <=45
+                       roll 1d100>=45    will roll 1 d100 and report each degree of success or failure for a roll >=45
+                       roll 1d100<45     will roll 1 d100 and report each degree of success or failure for a roll <45
+                       roll 1d100>45     will roll 1 d100 and report each degree of success or failure for a roll >45                        
+                       roll 3d10dl2      will roll 3 d10 and remove the lowest 2 die."""
+        if command.lower() == "rtchargen":
+            out = """Does the basic rolls for creating a Rogue Trader character all at once.
+              Rolls 9x 2d10+25 for characteristics plus an additional, optional replacment
+              Rolls 1d5 for wounds
+              Rolls 1d10 for fate"""
+        if command.lower() == "system":
+            out = """Provides access to internal bot systems, sometimes via password authentication
+              UpdateSelf [password]         - access DiceServitor github repo and preform a server-side self update
+              SetLogging [password] [level] - set server-side output.log logging level to:  INFO, WARNING, ERROR, CRITICAL, DEBUG.  Default is INFO
+              """
+        await inter.channel.send(inter.author.mention + " " + out)
 
 #Roll
 @bot.slash_command(
-    name="roll",
-    description= """Rolls dice. Syntax:  roll 3d10<=5#comment""",
+        description = "Rolls dice, see help for syntax",
+        help = """Rolls dice.  Supports Target Number, +/- modification, and drop lowest.
+                The command doesn't care about spacing, but any malformed arguments will throw it off. :(
+                Syntax:  roll 3d10#comment will roll 3 d10 with a comment (use underscores instead of spaces)
+                        roll 3d10+5       will roll 3 d10 and add 5 (Other supported math symbols include '-', '*', '/'.
+                                            Please note pemdas is not implemented. Use mdas as the input format)
+                        roll 1d100<=45    will roll 1 d100 and report each degree of success or failure for a roll <=45
+                        roll 1d100>=45    will roll 1 d100 and report each degree of success or failure for a roll >=45
+                        roll 1d100<45     will roll 1 d100 and report each degree of success or failure for a roll <45
+                        roll 1d100>45     will roll 1 d100 and report each degree of success or failure for a roll >45                        
+                        roll 3d10dl2      will roll 3 d10 and remove the lowest 2 die.""",
+        brief = "Rolls dice"
 )
-async def roll(inter, input: str):
+async def roll(inter, roll:str, comment:str = None):
     async with inter.channel.typing():
-        log.info("Roll command invoked by {}({}) with argument: {}".format(inter.author.name,inter.author.id,input))
-    await inter.response.send_message("Rolling: " + input + '\n' + str(DiceBot3.diceRolling(input)))
+        try:
+            if not comment == None: log.info("Roll command invoked by {}({}) with arguments: {}".format(inter.author.name,inter.author.id,roll + " " + comment))
+            else: log.info("Roll command invoked by {}({}) with arguments: {}".format(inter.author.name,inter.author.id,roll))
+            out = DiceBot3.diceRolling(roll)
+            log.info(out)            
+            
+        except Exception as e:
+            log.error(str(e))
+            out = "Unable to parse roll command, please refer to ``/help roll`` for syntax"
+        #message = inter.author.mention + " " + str(out)
+        message = "{} Request: ``{}`` Result: ``{}``".format(inter.author.mention, roll, out)
+        if not comment == None: message += " Comment: ``{}``".format(comment)
+    await inter.channel.send(message)
 
 # #Rtchargen
 @bot.slash_command(
-    help = """Does the basic rolls for creating a Rogue Trader character all at once.
-              Rolls 9x 2d10+25 for characteristics plus an additional, optional replacment
-              Rolls 1d5 for wounds
-              Rolls 1d10 for fate""",
-    description = "Rolls dice for Rogue Trader chargen"
+        help = """Does the basic rolls for creating a Rogue Trader character all at once.
+                Rolls 9x 2d10+25 for characteristics plus an additional, optional replacment
+                  Rolls 1d5 for wounds
+                  Rolls 1d10 for fate""",
+        description = "Rolls dice for Rogue Trader chargen"
 )
 async def rtchargen(inter):
     async with inter.channel.typing():
@@ -126,21 +169,22 @@ async def rtchargen(inter):
 
 # #System
 @bot.slash_command (
-    hidden=True,
-    help = """Provides access to internal bot systems, sometimes via password authentication
-              UpdateSelf [password]         - access DiceServitor github repo and preform a server-side self update
-              SetLogging [password] [level] - set server-side output.log logging level to:  INFO, WARNING, ERROR, CRITICAL, DEBUG.  Default is INFO""",
-    brief = "System command.  Can require authentication.")
+        guild_ids=[DEV_SVID],
+        hidden=True,
+        help = """Provides access to internal bot systems, sometimes via password authentication
+                  UpdateSelf [password]         - access DiceServitor github repo and preform a server-side self update
+                  SetLogging [password] [level] - set server-side output.log logging level to:  INFO, WARNING, ERROR, CRITICAL, DEBUG.  Default is INFO""",
+        brief = "System command.  Can require authentication.")
 @commands.has_role('DS-Developer')
 
 async def system(inter, argument:str):
     async with inter.channel.typing():
         args = argument.split(' ')
+        out = ""
         try:    
-            log.warning("System command invoked by {}({}) with arguments: {}".format(inter.author.name,inter.author.id,args))
-            out = ""
+            log.warning("System command invoked by {}({}) with arguments: {}".format(inter.author.name,inter.author.id,args))            
             if inter.guild.id != int(DEV_SVID):
-                raise Exception("System cmmand received from unauthorized server!")            
+                raise Exception("System command received from unauthorized server!")            
             if str(args[0]).lower() == "updateself":
                 if str(args[1]) == SYS_PASS:
                     log.warning("Update authentication successful.")
@@ -165,9 +209,10 @@ async def system(inter, argument:str):
 
 # #Custom Status
 @bot.slash_command (
-    hidden=True,
-    help = """Set the bot's custom status
-              custrole [password] [status]"""
+        guild_ids=[826534172079554581],
+        hidden=True,
+        help = """Set the bot's custom status
+                  custrole [password] [status]"""
 )
 @commands.has_role('DS-Developer')
 
