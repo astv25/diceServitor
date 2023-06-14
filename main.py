@@ -91,40 +91,39 @@ async def help(inter, command:str):
         out = ""
         if command.lower() == "roll":
             out = """Rolls dice.  Supports Target Number, +/- modification, and drop lowest.
-              The command doesn't care about spacing, but any malformed arguments will throw it off. :(
-              Syntax:  roll 3d10#comment will roll 3 d10 with a comment (use underscores instead of spaces)
-                       roll 3d10+5       will roll 3 d10 and add 5 (Other supported math symbols include '-', '*', '/'.
-                                         Please note pemdas is not implemented. Use mdas as the input format)
-                       roll 1d100<=45    will roll 1 d100 and report each degree of success or failure for a roll <=45
-                       roll 1d100>=45    will roll 1 d100 and report each degree of success or failure for a roll >=45
-                       roll 1d100<45     will roll 1 d100 and report each degree of success or failure for a roll <45
-                       roll 1d100>45     will roll 1 d100 and report each degree of success or failure for a roll >45                        
-                       roll 3d10dl2      will roll 3 d10 and remove the lowest 2 die."""
+The command doesn't care about spacing, but any malformed arguments will throw it off. :(
+Syntax:  roll 3d10#comment will roll 3 d10 with a comment (use underscores instead of spaces)
+roll 3d10+5       will roll 3 d10 and add 5 (Other supported math symbols include '-', '*', '/'.
+                  Please note pemdas is not implemented. Use mdas as the input format)
+roll 1d100<=45    will roll 1 d100 and report each degree of success or failure for a roll <=45
+roll 1d100>=45    will roll 1 d100 and report each degree of success or failure for a roll >=45
+roll 1d100<45     will roll 1 d100 and report each degree of success or failure for a roll <45
+roll 1d100>45     will roll 1 d100 and report each degree of success or failure for a roll >45                        
+roll 3d10dl2      will roll 3 d10 and remove the lowest 2 die."""
         if command.lower() == "rtchargen":
             out = """Does the basic rolls for creating a Rogue Trader character all at once.
-              Rolls 9x 2d10+25 for characteristics plus an additional, optional replacment
-              Rolls 1d5 for wounds
-              Rolls 1d10 for fate"""
+Rolls 9x 2d10+25 for characteristics plus an additional, optional replacment
+Rolls 1d5 for wounds
+Rolls 1d10 for fate"""
         if command.lower() == "system":
             out = """Provides access to internal bot systems, sometimes via password authentication
-              UpdateSelf [password]         - access DiceServitor github repo and preform a server-side self update
-              SetLogging [password] [level] - set server-side output.log logging level to:  INFO, WARNING, ERROR, CRITICAL, DEBUG.  Default is INFO
-              """
-        await inter.channel.send(inter.author.mention + " " + out)
+UpdateSelf [password]         - access DiceServitor github repo and preform a server-side self update
+SetLogging [password] [level] - set server-side output.log logging level to:  INFO, WARNING, ERROR, CRITICAL, DEBUG.  Default is INFO"""
+        await inter.response.send_message(inter.author.mention + " " + out)
 
 #Roll
 @bot.slash_command(
         description = "Rolls dice, see help for syntax",
         help = """Rolls dice.  Supports Target Number, +/- modification, and drop lowest.
-                The command doesn't care about spacing, but any malformed arguments will throw it off. :(
-                Syntax:  roll 3d10#comment will roll 3 d10 with a comment (use underscores instead of spaces)
-                        roll 3d10+5       will roll 3 d10 and add 5 (Other supported math symbols include '-', '*', '/'.
-                                            Please note pemdas is not implemented. Use mdas as the input format)
-                        roll 1d100<=45    will roll 1 d100 and report each degree of success or failure for a roll <=45
-                        roll 1d100>=45    will roll 1 d100 and report each degree of success or failure for a roll >=45
-                        roll 1d100<45     will roll 1 d100 and report each degree of success or failure for a roll <45
-                        roll 1d100>45     will roll 1 d100 and report each degree of success or failure for a roll >45                        
-                        roll 3d10dl2      will roll 3 d10 and remove the lowest 2 die.""",
+                  The command doesn't care about spacing, but any malformed arguments will throw it off. :(
+                  Syntax:  roll 3d10#comment will roll 3 d10 with a comment (use underscores instead of spaces)
+                           roll 3d10+5       will roll 3 d10 and add 5 (Other supported math symbols include '-', '*', '/'.
+                                             Please note pemdas is not implemented. Use mdas as the input format)
+                           roll 1d100<=45    will roll 1 d100 and report each degree of success or failure for a roll <=45
+                           roll 1d100>=45    will roll 1 d100 and report each degree of success or failure for a roll >=45
+                           roll 1d100<45     will roll 1 d100 and report each degree of success or failure for a roll <45
+                           roll 1d100>45     will roll 1 d100 and report each degree of success or failure for a roll >45                        
+                           roll 3d10dl2      will roll 3 d10 and remove the lowest 2 die.""",
         brief = "Rolls dice"
 )
 async def roll(inter, roll:str, comment:str = None):
@@ -141,12 +140,12 @@ async def roll(inter, roll:str, comment:str = None):
         #message = inter.author.mention + " " + str(out)
         message = "{} Request: ``{}`` Result: ``{}``".format(inter.author.mention, roll, out)
         if not comment == None: message += " Comment: ``{}``".format(comment)
-    await inter.channel.send(message)
+    await inter.response.send_message(message)
 
 # #Rtchargen
 @bot.slash_command(
         help = """Does the basic rolls for creating a Rogue Trader character all at once.
-                Rolls 9x 2d10+25 for characteristics plus an additional, optional replacment
+                  Rolls 9x 2d10+25 for characteristics plus an additional, optional replacment
                   Rolls 1d5 for wounds
                   Rolls 1d10 for fate""",
         description = "Rolls dice for Rogue Trader chargen"
@@ -247,7 +246,7 @@ async def custrole(inter, argument:str):
             log.error(e)
             out += "Exception in custrole: {}".format(e)
         message = inter.author.mention + " " + str(out)
-    await inter.channel.send(message)
+    await inter.response.send_message(message)
 
 def builddbpath(dbidRaw):
     log.info("Building database path...")

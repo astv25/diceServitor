@@ -91,25 +91,27 @@ def diceRolling(input):
             return out
 
 
-        def mathHandling(input):
-            total = 0
+        def mathHandling(input, total):
+            #total = 0
             nums = input
             for x in mathSymbols:
                 nums = nums.replace(x," ")
             nums = nums.split()
+            #print(input)
+            #print(nums)
             for x in input:
                 if x in mathSymbols:
+                    if x == '*':
+                        total *= int(nums[0])
+                        nums.pop(0)
+                    if x == '/':
+                        total /= int(nums[0])
+                        nums.pop(0)
                     if x == '+':
                         total += int(nums[0])
                         nums.pop(0)
                     if x == '-':
                         total -= int(nums[0])
-                        nums.pop(0)
-                    if x == '/':
-                        total /= int(nums[0])
-                        nums.pop(0)
-                    if x == '*':
-                        total *= int(nums[0])
                         nums.pop(0)
             return total
 
@@ -125,7 +127,8 @@ def diceRolling(input):
                 resultsTotal = 0
                 for x in results:
                     resultsTotal += x
-                resultsTotal += mathHandling(matches[2])
+                #resultsTotal += mathHandling(matches[2])
+                resultsTotal = mathHandling(matches[2],resultsTotal)
                 return str(results) + " Total = " + str(resultsTotal)
 
             return "Are you sure?"
@@ -139,7 +142,8 @@ def diceRolling(input):
                 resultsTotal = 0
                 for x in results:
                     resultsTotal += x
-                resultsTotal += mathHandling(matches[2])
+                #resultsTotal += mathHandling(matches[2])
+                resultsTotal = mathHandling(matches[2], resultsTotal)
                 return str(results) + " Total = " + str(resultsTotal) +" "+ matches[3]
             if (matches[3].isdigit()):
                 modNum = matches[3]
@@ -174,13 +178,15 @@ def diceRolling(input):
                     resultsTotal = 0
                     for x in output:
                         resultsTotal += x
-                    resultsTotal += mathHandling(matches[4])
+                    #resultsTotal += mathHandling(matches[4])
+                    resultsTotal = mathHandling(matches[4],resultsTotal)
                     return "Original rolls = "+ str(droppedOutput) +" After Dropping = " + str(output) + " Total = " + str(resultsTotal)
                 else:
                     resultsTotal = 0
                     for x in results:
                         resultsTotal += x
-                    resultsTotal += mathHandling(matches[4])
+                    #resultsTotal += mathHandling(matches[4])
+                    resultsTotal = mathHandling(matches[4],resultsTotal)
                     return str(output) + " Total = " + str(resultsTotal)
 
             return "Literally How?"
@@ -194,13 +200,15 @@ def diceRolling(input):
                 resultsTotal = 0
                 for x in output:
                     resultsTotal += x
-                resultsTotal += mathHandling(matches[4])
+                #resultsTotal += mathHandling(matches[4])
+                resultsTotal = mathHandling(matches[4],resultsTotal)
             else:
                 droppedOutput == None
                 resultsTotal = 0
                 for x in results:
                     resultsTotal += x
-                resultsTotal += mathHandling(matches[4])
+                #resultsTotal += mathHandling(matches[4])
+                resultsTotal = mathHandling(matches[4],resultsTotal)
             if droppedOutput == None:
                 return str(output) + " Total = " + str(resultsTotal) +" "+ matches[5]
             else:
