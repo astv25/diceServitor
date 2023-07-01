@@ -166,7 +166,7 @@ async def rtchargen(inter):
 async def timecode(inter, time:str, date:str):
     async with inter.channel.typing():
         log.info("Timecode command invoked by {}({})".format(inter.author.name,inter.author.id))
-        dt = datetime.strptime("{} {}".format(time, date), "%H:%M:%S %m/%d/%Y")
+        dt = datetime.strptime("{} \<t:{}\>".format(time, date), "%H:%M:%S %m/%d/%Y")
         epochtime = int(mktime(dt.timetuple()))
         out = "{} {}".format(inter.author.mention, epochtime)
     await inter.response.send_message(out)
