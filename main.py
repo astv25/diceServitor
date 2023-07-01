@@ -3,6 +3,8 @@ import platform
 import logging as log
 from xml.dom import minidom
 import DiceBot3
+from datetime import datetime
+from time import mktime
 
 import disnake
 from disnake.ext import commands
@@ -72,7 +74,7 @@ async def sping(inter: disnake.ApplicationCommandInteraction):
 @bot.slash_command( description = "Shows descriptions of commands" )
 async def help(inter, command:str):
     async with inter.channel.typing():
-        out = ""
+        out = "Command {} does not have help text, sorry".format(command)
         if command.lower() == "roll":
             out = """Rolls dice.  Supports Target Number, +/- modification, and drop lowest.  There's an optional comment field.
 The command doesn't care about spacing, but any malformed arguments will throw it off. :(
@@ -90,10 +92,15 @@ roll 3d10dl2      will roll 3 d10 and remove the lowest 2 die."""
 Rolls 9x 2d10+25 for characteristics plus an additional, optional replacment
 Rolls 1d5 for wounds
 Rolls 1d10 for fate"""
+        if command.lower() == "timecode":
+            out = """Generate an epoch timecode with a given 24 hr time, date in MM/DD/YYYY, and timezone offset"""
         if command.lower() == "system":
             out = """Provides access to internal bot systems, sometimes via password authentication
 UpdateSelf [password]         - access DiceServitor github repo and preform a server-side self update
 SetLogging [password] [level] - set server-side output.log logging level to:  INFO, WARNING, ERROR, CRITICAL, DEBUG.  Default is INFO"""
+        if command.lower() == "custrole":
+            out =  """Set the bot's custom status
+custrole [password] [status]"""
         await inter.response.send_message(inter.author.mention + " " + out)
 
 #Roll
@@ -144,21 +151,34 @@ async def rtchargen(inter):
         optreplace = DiceBot3.diceRolling("2d10+25")[-2:]
         wounds = DiceBot3.diceRolling("1d5")[0]
         fate = DiceBot3.diceRolling("1d10")[0]
-        out = "Characteristic rolls: {}".format(characteristics)
-        out += "  Optional replacement roll: {}".format(optreplace)
-        out += "  Wounds Roll:  {}".format(wounds)
-        out += "  Fate Roll:  {}".format(fate)
+        out = "Characteristic rolls: ``{}``".format(characteristics)
+        out += "  Optional replacement roll: ``{}``".format(optreplace)
+        out += "  Wounds Roll:  ``{}``".format(wounds)
+        out += "  Fate Roll:  ``{}``".format(fate)
         message = str(out)
     await inter.response.send_message(message)
 
+# #Generate epoch timecode
+@bot.slash_command(
+        help = """Generate an epoch timecode with a given 24hr time in HH:MM:SS, date in MM/DD/YYYY, and timezone offset""",
+        description = "Generate an epoch timecode"
+)
+async def timecode(inter, time:str, date:str):
+    async with inter.channel.typing():
+        log.info("Timecode command invoked by {}({})".format(inter.author.name,inter.author.id))
+        dt = datetime.strptime("{} {}".format(time, date), "%H:%M:%S %m/%d/%Y")
+        epochtime = int(mktime(dt.timetuple()))
+        out = "{} {}".format(inter.author.mention, epochtime)
+    await inter.response.send_message(out)
+
 # #System
-@bot.slash_command (
+@bot.slash_command(
+        dm_permission=False,
         guild_ids=[int(DEV_SVID)],
         help = """Provides access to internal bot systems, sometimes via password authentication
                   UpdateSelf [password]         - access DiceServitor github repo and preform a server-side self update
                   SetLogging [password] [level] - set server-side output.log logging level to:  INFO, WARNING, ERROR, CRITICAL, DEBUG.  Default is INFO""",
-        brief = "System command.  Can require authentication.")
-@commands.has_role('DS-Developer')
+        description = "System command.  Can require authentication.")
 
 async def system(inter, argument:str):
     async with inter.channel.typing():
@@ -191,12 +211,13 @@ async def system(inter, argument:str):
     await inter.response.send_message(message)
 
 # #Custom Status
-@bot.slash_command (
+@bot.slash_command(
+        dm_permission=False,
         guild_ids=[int(DEV_SVID)],
         help = """Set the bot's custom status
-                  custrole [password] [status]"""
+                  custrole [password] [status]""",
+        description = "Set a custom status for the bot."
 )
-@commands.has_role('DS-Developer')
 
 async def custrole(inter, argument:str):
     async with inter.channel.typing():
