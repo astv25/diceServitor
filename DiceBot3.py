@@ -48,28 +48,13 @@ def diceRolling(input):
             origrolls = []
             compequal=False
             compswitch=False
-            targetnumber=False
             dropped = []
             total = 0
             out = []
             origrolls.extend(rolls)
-            validops = ['>', '>=', '<=', '<', 'dl', 't']
+            validops = ['>', '>=', '<=', '<', 'dl']
             if not mod in validops:
                 return "Compare/Drop:  Invalid operator"
-            #do target number checks
-            if mod == 't':
-                print ("Rolled: " + str(origrolls))
-                index=0
-                tmprolls=[]
-                tmprolls.extend(rolls)
-                successes = 0
-                while index <= len(tmprolls):
-                    if tmprolls[index]>= num:
-                        successes += 1
-                    index += 1
-                out.append("Rolled {0}, TN {1}. {2} successes.".format(rolls, num, successes))
-                return out
-
             #drop lowest X
             if mod == 'dl':
                 print("Rolled: " + str(origrolls))
