@@ -1,8 +1,10 @@
+# %%
 import math
 import random
 import logging as log
 import re #([\d]+)d([\d]+)([><d+-/*]?[=l]?)([\d]+)?([+-/*\d]+)?(#.+)?
 
+# %%
 #Test cases:
 a = "1D100"
 b = "1d100>50"
@@ -14,12 +16,17 @@ g = "3d10dl2+5-3#comment"
 h = "1d10+2-4"
 i = "hkhkjhkh"
 j = "1d10#Hello world"
-testCases =[a,b,c,d,e,f,g,h,i,j]
+k = "5d10sd"
+l = "5d10+5sa"
+
+# %%
+testCases = [a,b,c,d,e,f,g,h,i,j,k,l]
 
 logFile = 'output.log'
 logLevel = log.INFO
 log.basicConfig(filename=logFile,level=logLevel)
 
+# %%
 def diceRolling(input):
     try:
         log.info("Rolling: " +input)
@@ -27,18 +34,33 @@ def diceRolling(input):
         pattern_d = re.compile('([\d]+)d([\d]+)([><d]?[=l]?)([\d]+)?([+-/*\d]+)?(#.+)?')
         matches = pattern_d.split(input)
         matches = list(filter(None,matches))
-        test =(len(matches))
+        #sort ascending, sort descending, or don't sort at all
+        #using pop to avoid altering the rest of the code
+        sortatall=False
+        sortdescending=False
+        if matches[-1] == 'sd':
+            sortatall=True
+            sortdescending=True
+            matches.pop()
+        if matches[-1] == 'sa':
+            sortatall=True
+            matches.pop()
+
+        test = (len(matches))
         rolls = []
         mathSymbols = ['+','-','/','*']
         modSymbols = ['>','<','d']
+
         # for match in matches:
-        #     print(match)
-        def rolling(numDice,numSides):
+            # print(match)
+
+        def rolling(numDice,numSides,sortAtAll,sortDescending):
             for i in range(1,numDice+1):
                 random.seed()
                 roll = random.randrange(1,numSides+1)
                 rolls.append(roll)
-            #rolls.sort()
+            if sortAtAll:
+                rolls.sort(reverse=sortDescending)
             return rolls
 
         def compareOrDrop(rolls,mod,num):
@@ -115,9 +137,9 @@ def diceRolling(input):
 
 
         def two():
-            return rolling(int(matches[0]),int(matches[1]))
+            return rolling(int(matches[0]),int(matches[1]),sortatall,sortdescending)
         def three():
-            results = rolling(int(matches[0]),int(matches[1]))
+            results = rolling(int(matches[0]),int(matches[1]),sortatall,sortdescending)
 
             if('#' in matches[2]):
                 return str(results) +" "+ matches[2]
@@ -130,7 +152,7 @@ def diceRolling(input):
 
             return "Are you sure?"
         def four():
-            results = rolling(int(matches[0]),int(matches[1]))
+            results = rolling(int(matches[0]),int(matches[1]),sortatall,sortdescending)
             dropTotal = 0
             droppedOutput = str(results)
             if (matches[2][0] in modSymbols):
@@ -153,7 +175,7 @@ def diceRolling(input):
                 return "Original rolls = "+ str(droppedOutput) +" After Dropping = " + str(output) + " Total = " + str(dropTotal)
             return output
         def five():
-            results = rolling(int(matches[0]),int(matches[1]))
+            results = rolling(int(matches[0]),int(matches[1]),sortatall,sortdescending)
             droppedOutput = str(results)
             if (matches[2][0] in modSymbols and matches[3][0].isdigit()):
                 mod = matches[2]
@@ -185,7 +207,7 @@ def diceRolling(input):
 
             return "Literally How?"
         def six():
-            results = rolling(int(matches[0]),int(matches[1]))
+            results = rolling(int(matches[0]),int(matches[1]),sortatall,sortdescending)
             mod = matches[2]
             modNum = int(matches[3])
             droppedOutput = str(results)
@@ -223,4 +245,5 @@ def diceRolling(input):
 
     except Exception as e:
         log.error(str(e))
+
 
