@@ -1,3 +1,9 @@
+# Database folder
+databases/
+
+# Sqlite files
+*.sqlite.db
+
 # Config
 config.xml
 
