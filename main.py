@@ -12,7 +12,13 @@ from disnake.ext import commands
 #BEGIN Logfile
 logFile = 'output.log'
 logLevel = log.INFO #Possible values:  INFO,WARNING,ERROR,CRITICAL,DEBUG
-log.basicConfig(filename=logFile,level=logLevel)
+log.basicConfig(
+    filename=logFile,
+    format='%(asctime)s %(levelname)-8s %(message)s',    
+    datefmt='%Y-%m-%d %H:%M:%S',
+    level=logLevel,
+    force=True
+    )
 #END Logfile
 
 log.info("Dice Servitor initializing...")
@@ -28,7 +34,6 @@ if platform.system() == 'Linux':
 config = minidom.parse(configFile)
 DISCORD_TOKEN = readConfig('discordToken')
 SYS_PASS = readConfig('adminPassword')
-SQL_FOLD = readConfig('sqlFolder')
 DEV_SVID = readConfig('devServerID')
 #END Config File
 
@@ -41,14 +46,10 @@ if SYS_PASS != None:
     log.info("System password loaded from config.")
 else:
     log.error("System password not loaded!")
-if SQL_FOLD != None:
-    log.info("SQLite folder path loaded!")
-else:
-    log.error("SQLite folder path not loaded!")
 if DEV_SVID != None:
     log.info("Dev server ID loaded!")
 else:
-    log.error("Dev server ID not loaded!")
+    log.info("Dev server ID not loaded!")
 #END Config Checks
 
 log.info("Dice Servitor initialized.")
@@ -56,20 +57,12 @@ log.info("Dice Servitor initialized.")
 #bot = commands.Bot(command_prefix="!")
 bot = commands.InteractionBot(sync_commands_debug=True)
 
-#Ping
-@bot.slash_command(
-    help = "Responds with 'pong'!",
-    brief = "Responds with 'pong'!"
-)
-async def ping(ctx):
-    await ctx.channel.send("pong")
-
 #Slash Command Ping
 @bot.slash_command(
-    name="sping",
+    name="ping",
 )
-async def sping(inter: disnake.ApplicationCommandInteraction):
-    await inter.response.send_message("Spong!")
+async def ping(inter: disnake.ApplicationCommandInteraction):
+    await inter.response.send_message("Pong!")
 
 @bot.slash_command( description = "Shows descriptions of commands" )
 async def help(inter, command:str):
@@ -93,7 +86,7 @@ Rolls 9x 2d10+25 for characteristics plus an additional, optional replacment
 Rolls 1d5 for wounds
 Rolls 1d10 for fate"""
         if command.lower() == "timecode":
-            out = """Generate an epoch timecode with a given 24 hr time, date in MM/DD/YYYY, and timezone offset"""
+            out = """Generate an epoch timecode with a given 24 hr time, date in MM/DD/YYYY"""
         if command.lower() == "system":
             out = """Provides access to internal bot systems, sometimes via password authentication
 UpdateSelf [password]         - access DiceServitor github repo and preform a server-side self update
@@ -160,15 +153,19 @@ async def rtchargen(inter):
 
 # #Generate epoch timecode
 @bot.slash_command(
-        help = """Generate an epoch timecode with a given 24hr time in HH:MM:SS, date in MM/DD/YYYY, and timezone offset""",
+        help = """Generate an epoch timecode with a given 24hr time in HH:MM:SS, date in MM/DD/YYYY""",
         description = "Generate an epoch timecode"
 )
 async def timecode(inter, time:str, date:str):
     async with inter.channel.typing():
         log.info("Timecode command invoked by {}({})".format(inter.author.name,inter.author.id))
-        dt = datetime.strptime("{} {}".format(time, date), "%H:%M:%S %m/%d/%Y")
-        epochtime = int(mktime(dt.timetuple()))
-        out = "{} \<t:{}\>".format(inter.author.mention, epochtime)
+        try:
+            dt = datetime.strptime("{} {}".format(time, date), "%H:%M:%S %m/%d/%Y")
+            epochtime = int(mktime(dt.timetuple()))
+            out = "{} \<t:{}:R\>".format(inter.author.mention, epochtime)
+        except Exception as e:
+            log.error(str(e))
+            out = str(e)
     await inter.response.send_message(out)
 
 # #System

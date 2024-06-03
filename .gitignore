@@ -1,14 +1,5 @@
-# Database folder
-databases/
-
-# Sqlite files
-*.sqlite.db
-
 # Config
 config.xml
-
-#Old Shit
-oldguts/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

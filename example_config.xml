@@ -4,9 +4,6 @@
 <discordToken></discordToken>
 <!-- Password used to authenticate System commands -->
 <adminPassword></adminPassword>
-<!-- Folder in which SQLite data files are stored -->
-<!-- Not required -->
-<sqlFolder></sqlFolder>
 <!-- Server ID of the bot development server -->
 <!-- Not requried -->
 <devServerID></devServerID>
