@@ -151,6 +151,31 @@ async def rtchargen(inter):
         message = str(out)
     await inter.response.send_message(message)
 
+#Owchargen
+@bot.slash_command(
+        help = """Does the basic rolls for creating an Only War character all at once.
+                  Rolls 9x 2d10+20 for characteristics plus an additional, optional replacment
+                  Rolls 1d5 for wounds
+                  Rolls 1d10 for fate""",
+        description = "Rolls dice for Only War chargen"
+)
+async def owchargen(inter):
+    async with inter.channel.typing():
+        log.info("Character generation command invoked by {}({})".format(inter.author.name,inter.author.id))
+        characteristics=[]
+        for x in range(9):
+            characteristics.append(DiceBot3.diceRolling("2d10+20")[-2:])
+        optreplace = DiceBot3.diceRolling("2d10+20")[-2:]
+        wounds = DiceBot3.diceRolling("1d5")[0]
+        fate = DiceBot3.diceRolling("1d10")[0]
+        out = "Characteristic rolls: ``{}``".format(characteristics)
+        out += "  Optional replacement roll: ``{}``".format(optreplace)
+        out += "  Wounds Roll:  ``{}``".format(wounds)
+        out += "  Fate Roll:  ``{}``".format(fate)
+        message = str(out)
+    await inter.response.send_message(message)
+
+
 # #Generate epoch timecode
 @bot.slash_command(
         help = """Generate an epoch timecode with a given 24hr time in HH:MM:SS, date in MM/DD/YYYY""",
