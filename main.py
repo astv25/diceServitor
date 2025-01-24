@@ -183,7 +183,7 @@ async def owchargen(inter):
 async def sosroll(inter, numdice:int, tn:int):
     async with inter.channel.typing():
         log.info("SoS Roll command invoked by {}({})".format(inter.author.name,inter.author.id))
-        rolls = DiceBot3.diceRolling(numdice+"d10")
+        rolls = DiceBot3.diceRolling(str(numdice)+"d10")
         successes = 0
         for die in rolls:
             if (die >= tn):
