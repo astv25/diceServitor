@@ -175,6 +175,23 @@ async def owchargen(inter):
         message = str(out)
     await inter.response.send_message(message)
 
+#SoSRoll
+@bot.slash_command(
+        help = """Rolls dice with a tn and counts successes""",
+        description= "Rolls dice with a tn and counts successes"
+)
+async def sosroll(inter, numDice:int, tn:int):
+    async with inter.channel.typing():
+        log.info("SoS Roll command invoked by {}({})".format(inter.author.name,inter.author.id))
+        rolls = DiceBot3.diceRolling(numDice+"d10")
+        successes = 0
+        for die in rolls:
+            if (die >= tn):
+                successes += 1
+        out = "Dice rolls: ``{}``".format(rolls)
+        out += " Successes: ``{}``".format(successes)
+        message = str(out)
+    await inter.response.send_message(message)
 
 # #Generate epoch timecode
 @bot.slash_command(
